@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<!--
+  banner.html — 상세에 딸려 나오는 이미지 2장: 인스타 피드 1장 + 대표 이미지(썸네일) 1장 (2026-11-21 주누: 네이버 광고·캐러셀·스토리는 뺐다)
+  상세페이지를 다 만든 뒤 "인스타 피드 이미지랑 썸네일도 같이 만들까요?"에 예라고 하면 쓴다. 규칙 전체는 references/banner.md.
+
+  목적: 인스타에서 보고 넘어왔을 때 "같은 가게"로 이어져 보이게. 그래서 새로 디자인하지 않는다 —
+        상세에 쓴 글·사진·색·폰트·구조선·사진 틀을 그대로 옮긴다.
+
+  쓰는 법 (Claude가 하는 일)
+  1. 이 파일을 상세페이지 폴더에 `5_배너.html`로 복사한다.
+  2. 루트 <div class="page bn">의 data-look / data-theme / data-font / data-preset 을 2_상세페이지.html 의 .page 와 똑같이.
+       data-look: scene(연출형 template.html) · spec(정보설득형 template-spec.html) · magazine(매거진형 template-magazine.html) · maker(실사형 template-maker.html)
+     상세에서 강조색·바탕색을 바꿨으면 그 값(.page 변수 6개)을 아래 [2] 테마 뒤 "상세에서 바꾼 값" 자리에 그대로 붙인다.
+     상세가 아래 [1]에 없는 폰트(warm·round·bold 등)를 썼으면 assets/fonts.css 에서 그 블록을 [1] 맨 위에 추가한다.
+  3. {{…}} 를 상세 문구로 채운다. 각 자리 옆 주석이 "상세의 어느 문구"인지 적혀 있다. 새 문구를 짓지 않는다 — 줄이기만.
+  4. 이미지 경로(images/…)는 상세에서 만든 파일 그대로. 누끼는 images/cut/01_main.png (상세 s-01 누끼).
+     이미지가 없으면 자리(.ph)가 점선 상자로 보인다.
+  5. python assets/export_banners.py 5_배너.html 5_배너/  → 정확한 픽셀 PNG/JPG + 점검 보고.
+
+  아트보드 = <section class="ab …" data-size="가로x세로" data-name="파일 이름" data-format="png|jpg" data-kb="최소-최대" data-safe="위 오른쪽 아래 왼쪽">
+  insta_feed 1080x1350 (4:5, 프로필 격자에선 가운데 1012x1350 = 3:4 만 보임 → 좌우 34px 안쪽에 글자)
+  thumb_1000 1000x1000 (흰 배경, 상품 누끼만, 글자 없음)
+
+  문구 규칙 (references/banner.md 3항)
+  - 한 장에 메시지 하나(후킹 + 상품명). 상품명은 상세 h1 과 같게. 상세에서 정한 핵심 반복 단어를 그대로.
+  - 광고로 돌릴 수 있게: 과장·단정·최상급(최고·1위·완벽·무조건) 없이 사실 묘사. 식품·화장품·건강식품 효능 금지(copywriting.md 그대로).
+  - 가격·할인·"무료배송"·구매 버튼 넣지 않는다.
+  - AI 연출컷이 들어간 장에만 .ai "연출 이미지(AI 활용)" 를 남긴다. 실물·누끼만 쓴 장은 지운다.
+  - 글자: 본문 28px 이상, 캡션·AI 표기 24px 이상. 대비 4.5:1. 이모지 금지(아이콘은 SVG).
+  - 크기는 고정 px (아트보드라 cqw 쓰지 않는다).
+-->
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{상품명}} 피드·썸네일</title>
+<style>
+  /* =========================================================
+     [1] 폰트 — 네 템플릿 기본 폰트 3종을 미리 넣어 둠(clean · tech · luxe). @import 는 <style> 맨 위.
+         상세가 다른 data-font 를 썼으면 assets/fonts.css 의 그 블록을 여기 맨 위에 붙인다.
+     ========================================================= */
+  @import url('https://cdn.jsdelivr.net/gh/fonts-archive/Pretendard/subsets/Pretendard-dynamic-subset.css');
+  @import url('https://cdn.jsdelivr.net/gh/fonts-archive/GmarketSans/subsets/GmarketSans-dynamic-subset.css');
+  @import url('https://cdn.jsdelivr.net/gh/fonts-archive/SpoqaHanSansNeo/subsets/SpoqaHanSansNeo-dynamic-subset.css');
+  @import url('https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/subsets/MaruBuri-dynamic-subset.css');
+  .page[data-font="clean"]{
+    --font-display:'Pretendard',-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    --font-body:'Pretendard',-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    --display-weight:800; --display-tracking:-.025em;
+  }
+  .page[data-font="tech"]{
+    --font-display:'Gmarket Sans','Pretendard',sans-serif;
+    --font-body:"Spoqa Han Sans Neo",-apple-system,"Noto Sans KR",sans-serif;
+    --display-weight:700; --display-tracking:-.02em;
+  }
+  .page[data-font="luxe"]{
+    --font-display:'Maru Buri','Noto Serif KR',serif;
+    --font-body:'Pretendard',-apple-system,"Noto Sans KR",sans-serif;
+    --display-weight:600; --display-tracking:-.01em;
+  }
+
+  /* =========================================================
+     [2] 결(look)별 기본 색 = 각 템플릿의 clean 값 그대로. 그 뒤에 테마(warm·luxe·pop)·프리셋이 덮는다 (템플릿과 같은 순서)
+     ========================================================= */
+  .page{--font-display:'Pretendard',sans-serif;--font-body:'Pretendard',sans-serif;--display-weight:800;--display-tracking:-.025em;
+        --paper:#ffffff;--shadow:none;--radius:0px}
+  .page[data-look="scene"]{--bg:#ffffff;--bg-2:#f4f5f7;--fg:#111318;--fg-2:#5c6370;--accent:#1b4fd8;--accent-fg:#ffffff;--line:#e3e6ea;--radius-card:12px}
+  .page[data-look="spec"]{--bg:#ffffff;--bg-2:#f2f4f7;--fg:#0f1419;--fg-2:#566070;--accent:#1b4fd8;--accent-fg:#ffffff;--line:#dfe3e8;--radius-card:10px}
+  .page[data-look="magazine"]{--bg:#faf8f4;--bg-2:#f0ece4;--fg:#1f1c19;--fg-2:#6a6259;--accent:#8c5a3c;--accent-fg:#ffffff;--line:#e2dcd2;--radius-card:2px}
+  .page[data-look="maker"]{--bg:#ffffff;--bg-2:#f4f5f7;--fg:#111318;--fg-2:#5c6370;--accent:#1b4fd8;--accent-fg:#ffffff;--line:#e3e6ea;--radius-card:14px}
+  .page[data-theme="warm"]{--bg:#fffaf3;--bg-2:#f8ecdc;--fg:#2f2416;--fg-2:#7a6650;--accent:#c2410c;--line:#ead9c4}
+  .page[data-theme="luxe"]{--bg:#121212;--bg-2:#1c1c1e;--fg:#f4f1ea;--fg-2:#b5ae9f;--accent:#c9a961;--accent-fg:#121212;--line:#2c2c2e;--paper:#232325}
+  .page[data-theme="pop"]{--bg:#ffffff;--bg-2:#fff0f6;--fg:#1a1023;--fg-2:#6d5a7a;--accent:#e0317e;--line:#f3d6e4}
+  /* 상세에서 바꾼 값 (있으면 여기에 .page[data-theme] 뒤로 붙인다. 예: .page.bn{--accent:#b45309}) */
+
+  /* [3] 프리셋 — assets/presets.css 사본(색 변수만 쓰인다). presets.css 가 바뀌면 다시 붙인다 */
+  .page[data-preset="fashion"]{--bg:#ffffff;--bg-2:#f4f4f2;--fg:#111318;--fg-2:#6b6f76;--accent:#111318;--accent-fg:#ffffff;--line:#e6e6e3;--radius-card:4px}
+  .page[data-preset="beauty"]{--bg:#ffffff;--bg-2:#f3f6fb;--fg:#111318;--fg-2:#5c6370;--accent:#2563eb;--accent-fg:#ffffff;--line:#e2e8f0}
+  .page[data-preset="baby"]{--bg:#fffaf5;--bg-2:#fdeee4;--fg:#3b2f2a;--fg-2:#7d6a60;--accent:#e4653f;--accent-fg:#ffffff;--line:#f0dccf;--radius-card:20px}
+  .page[data-preset="food"]{--bg:#fffaf3;--bg-2:#f8ecdc;--fg:#2f2416;--fg-2:#7a6650;--accent:#c2410c;--accent-fg:#ffffff;--line:#ead9c4}
+  .page[data-preset="kitchen"]{--bg:#ffffff;--bg-2:#eef5f4;--fg:#111318;--fg-2:#5c6370;--accent:#0f766e;--accent-fg:#ffffff;--line:#d9e7e5}
+  .page[data-preset="living"]{--bg:#ffffff;--bg-2:#fff1f1;--fg:#111318;--fg-2:#5c6370;--accent:#dc2626;--accent-fg:#ffffff;--line:#f5d5d5;--radius-card:14px}
+  .page[data-preset="interior"]{--bg:#faf9f7;--bg-2:#f0ede8;--fg:#2b2622;--fg-2:#7a716a;--accent:#6b5b4e;--accent-fg:#ffffff;--line:#e4dfd8;--display-weight:600;--display-tracking:-.02em}
+  .page[data-preset="tech"]{--bg:#ffffff;--bg-2:#f1f4f9;--fg:#0f172a;--fg-2:#475569;--accent:#1d4ed8;--accent-fg:#ffffff;--line:#dbe2ee;--radius-card:10px}
+  .page[data-preset="sport"]{--bg:#121212;--bg-2:#1c1c1e;--fg:#f4f1ea;--fg-2:#b8b3a7;--accent:#f59e0b;--accent-fg:#121212;--line:#2c2c2e;--paper:#232325}
+  .page[data-preset="auto"]{--bg:#ffffff;--bg-2:#eef1f5;--fg:#0f172a;--fg-2:#475569;--accent:#1e293b;--accent-fg:#ffffff;--line:#d7dde6;--radius-card:10px}
+  .page[data-preset="book"]{--bg:#fdfcf9;--bg-2:#f3efe6;--fg:#2a2420;--fg-2:#6f655c;--accent:#7c2d12;--accent-fg:#ffffff;--line:#e6dfd2;--radius-card:6px}
+  .page[data-preset="toy"]{--bg:#ffffff;--bg-2:#fff0f6;--fg:#1a1023;--fg-2:#6d5a7a;--accent:#e0317e;--accent-fg:#ffffff;--line:#f3d6e4;--radius-card:20px}
+  .page[data-preset="stationery"]{--bg:#ffffff;--bg-2:#f5f3ff;--fg:#1e1b2e;--fg-2:#6b6480;--accent:#7c3aed;--accent-fg:#ffffff;--line:#e4dcf7}
+  .page[data-preset="pet"]{--bg:#fffbf2;--bg-2:#fdf0d5;--fg:#3b2f1a;--fg-2:#7d6a45;--accent:#d97706;--accent-fg:#ffffff;--line:#f0e2c4;--radius-card:18px}
+  .page[data-preset="health"]{--bg:#ffffff;--bg-2:#f0f7f2;--fg:#111318;--fg-2:#4b5563;--accent:#15803d;--accent-fg:#ffffff;--line:#d6e8dc;--radius-card:10px}
+  .page[data-gift="true"]{--accent:#c9a961;--accent-fg:#121212}
+  /* 실사형 선(안내문 판 테두리) — 템플릿과 같은 식 */
+  .page{--rule:color-mix(in srgb,var(--fg) 26%,var(--paper))}
+
+  /* =========================================================
+     [4] 작업 화면 (미리보기) — 내보낼 땐 export_banners.py 가 html[data-mode="export"] 로 바꿔 축소·라벨·가이드를 끈다
+     ========================================================= */
+  *{box-sizing:border-box;margin:0;padding:0}
+  ul,ol{list-style:none}
+  [hidden]{display:none!important}
+  html{-webkit-text-size-adjust:100%}
+  body{background:#e9ebee;font-family:'Pretendard',sans-serif;word-break:keep-all;overflow-wrap:break-word}
+  .sheet{display:flex;flex-wrap:wrap;align-items:flex-start;gap:56px;padding:48px}
+  html:not([data-mode="export"]) .sheet{zoom:.42}
+  .art{display:flex;flex-direction:column;gap:14px}
+  .art > .lbl{font:600 28px/1.3 'Pretendard',sans-serif;color:#3b4250}
+  .art > .lbl small{font-weight:400;color:#6b7280;margin-left:.6em}
+  .tools{position:sticky;top:0;z-index:9;display:flex;gap:12px;align-items:center;padding:12px 20px;background:#fff;border-bottom:1px solid #d6dae0;font:14px/1.4 'Pretendard',sans-serif;color:#3b4250}
+  .tools button{font:inherit;padding:8px 14px;border:1px solid #9aa3af;border-radius:8px;background:#fff;color:#111;cursor:pointer;min-height:40px}
+  .tools button:focus-visible{outline:3px solid #1b4fd8;outline-offset:2px}
+  html[data-mode="export"] .tools,html[data-mode="export"] .art > .lbl{display:none}
+  html[data-mode="export"] body{background:transparent}
+  html[data-mode="export"] .sheet{gap:40px;padding:20px}
+
+  /* =========================================================
+     [5] 아트보드 공통 — 고정 px. 글자 크기는 판마다 변수로(1080 폭 기준 본문 28↑ · 캡션 24↑)
+     ========================================================= */
+  .bn{color:var(--fg)}
+  .ab{position:relative;overflow:hidden;flex:none;display:flex;flex-direction:column;gap:var(--g);padding:var(--pad);
+      background:var(--bg);color:var(--fg);font-family:var(--font-body);line-height:1.5;word-break:keep-all;overflow-wrap:break-word;
+      --pad:80px;--g:40px;--s-brand:30px;--s-lead:40px;--s-name:96px;--s-hd:72px;--s-body:34px;--s-sub:30px;--s-cap:24px;--s-big:200px}
+  .ab.alt{background-color:var(--bg-2)}
+  .ab[data-size="1080x1350"]{width:1080px;height:1350px}
+  .ab[data-size="1000x1000"]{width:1000px;height:1000px}
+
+  svg{display:block;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  img{display:block;width:100%;height:100%;object-fit:cover;background:transparent}
+  .ph{width:100%;height:100%;min-height:120px;display:flex;align-items:center;justify-content:center;padding:16px;text-align:center;
+      background:var(--bg-2);border:2px dashed var(--fg-2);color:var(--fg-2);font-size:24px;line-height:1.4}
+
+  /* 글자 역할 — 상세 템플릿과 같은 이름 (.lead / h1 / .u / .lt) */
+  .brand{display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+  .brand b{flex:none;font-size:var(--s-brand);font-weight:800;letter-spacing:.16em;line-height:1.2}
+  .brand span{min-width:0;text-align:right;font-size:var(--s-cap);color:var(--fg-2);letter-spacing:.2em}
+  .copy{display:flex;flex-direction:column;gap:18px}
+  .lead{font-size:var(--s-lead);color:var(--fg-2);line-height:1.45;text-wrap:balance}
+  .name{font-family:var(--font-display);font-weight:var(--display-weight);letter-spacing:var(--display-tracking);text-wrap:balance;color:var(--fg)}
+  .name{font-size:var(--s-name);line-height:1.14}
+
+  .lt{font-weight:300}
+  .u{text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:.1em;text-underline-offset:.14em;text-decoration-skip-ink:none}
+  .name b{font-weight:inherit;color:var(--accent)}
+  .fn,.ai,.cap{font-size:var(--s-cap);color:var(--fg-2);line-height:1.45}
+  .ai{margin-top:auto;align-self:flex-end;text-align:right}
+
+  .num{font-variant-numeric:tabular-nums}
+
+  /* 그림 자리 — .cut(누끼) · .photo(사진). 결마다 하나만 보인다: data-only="scene spec" 처럼 */
+  .vis{position:relative;flex:1 1 0;min-height:0;display:flex;align-items:stretch;justify-content:center}
+  .vis .cut{width:100%;height:100%;object-fit:contain}
+  .photo{position:relative;display:flex;flex-direction:column;min-height:0;flex:1 1 0;width:100%}
+  .photo .frame{position:relative;flex:1 1 0;min-height:0;overflow:hidden}
+  .photo .cap{display:none}
+  .bn[data-look="scene"] [data-only]:not([data-only~="scene"]),
+  .bn[data-look="spec"] [data-only]:not([data-only~="spec"]),
+  .bn[data-look="magazine"] [data-only]:not([data-only~="magazine"]),
+  .bn[data-look="maker"] [data-only]:not([data-only~="maker"]){display:none!important}
+  .bn[data-ai="off"] .ai{display:none}
+
+  /* 목록 슬롯 (공감 3 · 장점 3 · 후기) — 결마다 모양만 다르다 */
+
+
+  /* 개발용: 안전 여백 가이드 (도구 줄의 버튼으로 켜고 끈다. 내보낼 땐 항상 꺼짐) */
+  .ab[data-safe]::after{content:"";position:absolute;z-index:20;pointer-events:none;display:none;
+     top:var(--st,0);right:var(--sr,0);bottom:var(--sb,0);left:var(--sl,0);outline:3px dashed #ff2d55;background:rgba(255,45,85,.06)}
+  .bn[data-guides="on"] .ab[data-safe]::after{display:block}
+  html[data-mode="export"] .ab[data-safe]::after{display:none!important}
+
+  /* =========================================================
+     [6] 결 ① 연출형 scene — 질감 바탕(.tex) + 주인공 누끼 하나 + 모양 있는 면(말풍선·우표·인장) + 굵은 제목에 .lt 섞기
+     ========================================================= */
+  .bn[data-look="scene"] .ab{background-image:var(--tex,none);background-size:860px auto;background-repeat:repeat;--tex:url(images/tex_a.jpg)}
+  .bn[data-look="scene"] .ab.alt{--tex:url(images/tex_b.jpg)}
+  .bn[data-look="scene"] .copy{text-align:center;align-items:center}
+  .bn[data-look="scene"] .name{line-height:1.12}
+  .bn[data-look="scene"] .vis .cut{transform:rotate(var(--r,-4deg));filter:drop-shadow(0 14px 20px rgba(70,45,20,.22))}
+  .bn[data-look="scene"] .photo .frame{width:76%;margin:0 auto;border-radius:999px 999px 32px 32px}   /* 아치 틀 */
+
+  /* =========================================================
+     [7] 결 ② 정보설득형 spec — 흰 바탕 + 굵은 고딕 + 2px 진한 머리선·1px 구분선 + 숫자. 카드 대신 선. 강조색 면은 띠 한 곳
+     ========================================================= */
+  .bn[data-look="spec"] .brand{border-bottom:2px solid var(--fg);padding-bottom:20px}
+  .bn[data-look="spec"] .brand b{font-family:var(--font-display);font-weight:700;letter-spacing:.08em}
+  .bn[data-look="spec"] .brand span{letter-spacing:0}
+  .bn[data-look="spec"] .lead{font-weight:500}
+  .bn[data-look="spec"] .name{line-height:1.12}
+  .bn[data-look="spec"] .u{text-decoration:none;background:linear-gradient(transparent 58%,color-mix(in srgb,var(--accent) 26%,transparent) 58%);-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 .04em}
+  .bn[data-look="spec"] .vis{background:var(--bg-2);border-radius:var(--radius-card);padding:40px}      /* .stage 받침 */
+  .bn[data-look="spec"] .ab.alt .vis{background:var(--bg)}
+  .bn[data-look="spec"] .photo .frame{border-radius:var(--radius-card)}
+  .bn[data-look="spec"] .vis:has(> .photo:not([data-only])){padding:0;background:none}
+  .facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:2px solid var(--fg);border-bottom:1px solid var(--line)}
+  .facts > div{padding:22px 20px;border-left:1px solid var(--line)}
+  .facts > div:first-child{border-left:0;padding-left:0}
+  .facts dt{font-size:var(--s-cap);color:var(--fg-2);line-height:1.35}
+  .facts dd{margin-top:4px;font-family:var(--font-display);font-weight:var(--display-weight);font-size:46px;line-height:1.1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .facts dd small{margin-left:.12em;font-size:24px;color:var(--fg-2)}
+
+  /* =========================================================
+     [8] 결 ③ 매거진형 magazine — 종이색 한 가지, 명조 제목 크고 가늘게, 큰 사진이 먼저(풀블리드↔비켜 놓기). 선은 1px, 상자 거의 없음
+     ========================================================= */
+  .bn[data-look="magazine"] .ab{line-height:1.7}
+  .bn[data-look="magazine"] .brand{border-bottom:1px solid var(--fg)}
+  .bn[data-look="magazine"] .brand b{font-family:var(--font-body);font-weight:700;letter-spacing:.32em}
+  .bn[data-look="magazine"] .brand span{letter-spacing:.04em}
+  .bn[data-look="magazine"] .name{line-height:1.22}
+  .bn[data-look="magazine"] .name .lt{display:block;font-size:.42em;letter-spacing:.02em;line-height:1.5;font-weight:400;color:var(--fg-2)}
+  .bn[data-look="magazine"] .name br{display:none}
+  .bn[data-look="magazine"] .u{text-decoration-thickness:max(1px,.045em);text-underline-offset:.2em}
+
+  /* 풀블리드 사진: 아트보드 가장자리까지 */
+  .bn[data-look="magazine"] .bleed{order:-1;flex:0 0 auto;height:var(--bh,760px);margin:calc(-1 * var(--pad)) calc(-1 * var(--pad)) 0;width:auto}
+
+  .bn[data-look="magazine"] .ai{position:absolute;right:var(--pad);bottom:28px}
+
+  /* =========================================================
+     [9] 결 ④ 실사형 maker — 따뜻한 종이색 + 흰 테(.mat) 실사 + "실물 촬영 · 날짜 · 장소" 캡션 + 큰 글씨 안내문 판(.card). 기울이기·테이프 없음
+     ========================================================= */
+  .bn[data-look="maker"] .ab{line-height:1.6;--s-body:36px;--s-sub:32px}
+  .bn[data-look="maker"] .brand b{font-weight:800;letter-spacing:-.01em}
+  .bn[data-look="maker"] .brand span{letter-spacing:0}
+  .bn[data-look="maker"] .lead{font-weight:600}
+  .bn[data-look="maker"] .name{line-height:1.18}
+  .bn[data-look="maker"] .lt{font-weight:400}
+  .bn[data-look="maker"] .u{text-decoration:none;color:var(--accent)}
+  .bn[data-look="maker"] .photo .frame{padding:14px;background:var(--paper);border:1px solid var(--line);border-radius:4px;box-shadow:0 2px 12px rgba(60,40,20,.08)}
+  .bn[data-look="maker"] .photo .frame img,.bn[data-look="maker"] .photo .frame .ph{border-radius:2px}
+  .bn[data-look="maker"] .photo .cap{display:flex;align-items:center;gap:.45em;padding-top:12px;font-variant-numeric:tabular-nums}
+  .bn[data-look="maker"] .photo .cap svg{flex:none;width:1.2em;height:1.2em;stroke:currentColor;stroke-width:1.8}
+  .bn[data-look="maker"] .photo .cap b{font-weight:700;color:var(--fg)}
+
+  /* =========================================================
+     [10] 대표 이미지 — 흰 배경 + 누끼만 (질감·기울임·그림자 없음)
+     ========================================================= */
+  .ab.thumb{padding:0;background:transparent!important;background-image:none!important}
+  .ab.thumb .cut{transform:none!important;filter:none!important}
+  .ab.thumb{background:#ffffff!important}
+  .ab.thumb .vis{padding:80px;background:#ffffff!important;border-radius:0}
+
+</style>
+</head>
+<body>
+<div class="tools">
+  <b>인스타 피드 · 대표 이미지</b>
+  <button type="button" onclick="var p=document.querySelector('.bn');p.dataset.guides=p.dataset.guides==='on'?'off':'on'">안전 여백 가이드 켜기/끄기</button>
+  <span>미리보기는 42% 축소. 빨간 점선 = 인스타 프로필 격자(3:4)에 보이는 곳. 내보내기: python assets/export_banners.py 이파일.html 5_배너/</span>
+</div>
+
+<!-- 루트: 상세 2_상세페이지.html 의 .page 값 그대로 -->
+<div class="page bn" data-look="maker" data-theme="warm" data-font="clean" data-preset="" data-guides="off" data-ai="on">
+<div class="sheet">
+
+<!-- ==================== 인스타 피드 1080x1350 — 메시지: 상세 s-01 .lead 후킹 + h1 상품명 ==================== -->
+<figure class="art"><figcaption class="lbl">insta_feed <small>1080×1350 (4:5) · 격자 3:4 안전 영역</small></figcaption>
+<section class="ab feed" data-size="1080x1350" data-name="insta_feed" data-format="png" data-safe="0 34 0 34" style="--sr:34px;--sl:34px">
+  <header class="brand"><b>{{브랜드}}</b><span>{{카테고리}}</span></header>   <!-- 상세 .brandbar 그대로 (영문 브랜드 + 카테고리) -->
+  <div class="copy">
+    <p class="lead">{{후킹}}</p>                                              <!-- 상세 s-01 .lead 그대로 -->
+    <h1 class="name"><span class="lt">{{h1 첫 줄}}</span><br><span class="u">{{상품명}}</span></h1>   <!-- 상세 s-01 h1 안쪽 그대로 ({{h1 첫 줄}} = h1 의 <br> 앞, 보통 브랜드 한글 이름) -->
+  </div>
+  <div class="vis bleed" style="--bh:720px">
+    <img class="cut" data-only="scene spec" src="images/cut/01_main.png" alt="{{상품명}}" onerror="this.outerHTML='<div class=\'ph\' data-only=\'scene spec\'>cut/01_main.png (누끼)</div>'">
+    <figure class="photo" data-only="magazine maker"><div class="frame"><img src="images/01_hook.png" alt="{{상품명}}" onerror="this.outerHTML='<div class=\'ph\'>01_hook (상세 첫 화면 사진)</div>'"></div>
+      <figcaption class="cap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b>실물 촬영</b> · {{촬영 날짜 · 장소}}</figcaption></figure>   <!-- 상세 s-01 .cap 그대로 -->
+  </div>
+  <dl class="facts" data-only="spec">                                         <!-- 정보설득형만: 상세 s-01 .ribbon 3칸 그대로 -->
+    <div><dt>{{스펙1 이름}}</dt><dd>{{스펙1 값}}<small>{{스펙1 단위}}</small></dd></div>
+    <div><dt>{{스펙2 이름}}</dt><dd>{{스펙2 값}}<small>{{스펙2 단위}}</small></dd></div>
+    <div><dt>{{스펙3 이름}}</dt><dd>{{스펙3 값}}<small>{{스펙3 단위}}</small></dd></div>
+  </dl>
+  <p class="ai">연출 이미지(AI 활용)</p>                                    <!-- AI 연출컷이 들어간 장에만. 실물·누끼만이면 지운다 -->
+</section></figure>
+
+<!-- ==================== 대표 이미지 1000x1000 (쿠팡·스마트스토어 썸네일) — 흰 배경, 상품만, 글자·합성·테두리 금지 ==================== -->
+<figure class="art"><figcaption class="lbl">thumb_1000 <small>1000×1000 · 흰 배경 · 상품만</small></figcaption>
+<section class="ab thumb" data-size="1000x1000" data-name="thumb_1000" data-format="jpg" data-kb="0-10000">
+  <div class="vis"><img class="cut" src="images/cut/01_main.png" alt="{{상품명}}" onerror="this.outerHTML='<div class=\'ph\'>cut/01_main.png</div>'"></div>
+</section></figure>
+
+</div>
+</div>
+<script>
+  /* data-size 로 크기를 한 번 더 박는다(새 규격을 추가해도 CSS 를 안 고쳐도 되게) */
+  document.querySelectorAll('.ab[data-size]').forEach(function(ab){
+    var s = ab.dataset.size.split('x'); ab.style.width = s[0] + 'px'; ab.style.height = s[1] + 'px';
+  });
+
+</script>
+</body>
+</html>

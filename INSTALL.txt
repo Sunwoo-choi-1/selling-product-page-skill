@@ -1,0 +1,139 @@
+[잘 팔리는 상세페이지 스킬 세트] 준비물 · 설치 · 사용                     버전 2026-11-21
+
+질문 10개에 답하면 기획안 → 상세페이지 HTML → 스마트스토어·쿠팡에 바로 올릴 이미지까지 만들어 주는 스킬이에요.
+이 세트 = selling-product-page(상세페이지 스킬) + impeccable(디자인 마감 스킬) 두 폴더.
+
+====================================================
+1. 준비물
+====================================================
+
+[꼭 필요]
+  □ AI 코딩 도구 하나 — 둘 중 편한 것
+      · Claude Code (권장, 유료 플랜 Pro 이상) — 터미널·데스크톱 앱·VS Code 어디서든
+      · Codex (ChatGPT 유료 플랜) — 아래 "5. Codex에서 쓰기"
+      상세페이지 하나 만드는 데 질문 10개 + 파일 여러 개 생성이라 무료 한도로는 중간에 끊길 수 있어요.
+  □ Python 3.10 이상 + 패키지 2개 — 업로드 이미지 뽑기·쇼핑몰 변환에 써요.
+      · 설치: https://www.python.org/downloads/  (Windows는 설치 첫 화면에서 "Add python.exe to PATH" 꼭 체크)
+      · 패키지:  pip install playwright pillow
+      · 브라우저: Windows는 Edge가 있어서 추가 설치 없음. Mac은 Chrome이 있으면 되고, 없으면
+                  python -m playwright install chromium
+      · 잘 모르겠으면 Claude/Codex에게 "파이썬이랑 playwright 설치 확인해줘"라고 하면 대신 확인·설치해 줘요.
+  □ 상품 정보 메모 — 구성, 사이즈/용량, 원재료(식품)·전성분(화장품)·제조국·재질, 배송·교환 기준
+      (미리 적어 두면 질문에 10분이면 답해요. 판매가는 안 넣어요 — 가격은 플랫폼 가격 칸이 보여줘요)
+  □ 상품 사진 — 정면·뒷면·쓰는 모습·포장. 폰 사진이면 충분해요. 진짜 사진이 제일 잘 팔려요.
+
+[AI 이미지 — 둘 중 하나 (없어도 동작)]
+  □ 힉스필드(Higgsfield) 유료 구독 + 연결 — 장면·연출 컷을 스킬이 직접 만들어요. 연결법은 "3. 힉스필드 연결".
+  □ GPT 이미지(ChatGPT 이미지 생성) — 힉스필드가 없으면 스킬이 프롬프트를 써 주니 ChatGPT에 붙여넣어 만들고
+      받은 이미지를 작업 폴더 images\ 에 넣으면 돼요.
+  둘 다 없으면 본인 사진만으로 만들어요(이것도 충분히 팔려요). AI 사진엔 "연출 이미지(AI 활용)" 표기가 자동으로 붙어요.
+
+[있으면 더 좋음]
+  □ Git — 깃허브로 설치·업데이트할 때만 (https://git-scm.com)
+  □ Node.js — 힉스필드를 "CLI 방식"(3번의 ③)으로 연결할 때만 필요 (https://nodejs.org, LTS 버전)
+      · 스킬 자체와 impeccable은 Node.js 없이 돌아가요.
+  □ 실제 후기·판매량·인증서 — 있으면 신뢰 섹션이 채워져서 전환이 확 달라져요.
+      (없으면 지어내지 않고 "이런 분께 맞아요/안 맞아요", "고르는 기준" 표로 대신해요)
+
+[필요 없음]
+  × 포토샵, 미리캔버스, 디자이너   × 폰트 설치(무료 웹폰트 자동)   × 코딩 지식
+
+====================================================
+2. 설치 (Claude Code)
+====================================================
+설치 위치 (스킬 폴더):
+     Windows : C:\Users\(내이름)\.claude\skills\
+     Mac     : /Users/(내이름)/.claude/skills/
+     (.claude 폴더가 안 보이면 "숨김 파일 보기"를 켜세요. skills 폴더가 없으면 새로 만들면 돼요)
+
+[방법 A — zip 파일]
+  1. sangsepage-skill-set.zip 압축을 풉니다.
+  2. 안에 있는 selling-product-page 폴더와 impeccable 폴더를 통째로 위 skills 폴더에 넣습니다.
+     (폴더 안에 폴더가 한 겹 더 생기지 않게 — skills\selling-product-page\SKILL.md 가 바로 보여야 해요)
+  3. Claude Code를 다시 켭니다.
+
+[방법 B — 깃허브]
+  저장소: https://github.com/Sunwoo-choi-1/selling-product-page-skill
+  (공개 저장소 — 누구나 받을 수 있어요. zip 파일은 저장소 오른쪽 Releases에서도 받을 수 있어요)
+  Windows (PowerShell):
+     git clone https://github.com/Sunwoo-choi-1/selling-product-page-skill.git $HOME\sangsepage
+     Copy-Item -Recurse -Force $HOME\sangsepage\selling-product-page, $HOME\sangsepage\impeccable $HOME\.claude\skills\
+  Mac (터미널):
+     git clone https://github.com/Sunwoo-choi-1/selling-product-page-skill.git ~/sangsepage
+     mkdir -p ~/.claude/skills && cp -R ~/sangsepage/selling-product-page ~/sangsepage/impeccable ~/.claude/skills/
+  업데이트: sangsepage 폴더에서  git pull  한 뒤 같은 복사 명령을 한 번 더.
+  (깃이 어렵다면 Claude Code에 저장소 주소를 주고 "이 저장소의 두 폴더를 내 스킬 폴더에 설치해줘"라고 하면 대신 해 줘요)
+
+[방법 C — .skill 파일 (claude.ai 웹·데스크톱 앱 채팅에서 쓸 때)]
+  claude.ai → 설정 → 기능(Capabilities) → 스킬 → 업로드에서 selling-product-page.skill 을 올립니다.
+  웹 채팅에선 기획안·HTML까지는 되지만 업로드 이미지 뽑기(브라우저 캡처)는 안 될 수 있어요 — 이미지까지는 Claude Code 권장.
+
+설치 확인: Claude Code에서  /selling-product-page  가 목록에 뜨면 성공.
+
+====================================================
+3. 힉스필드 연결 (Claude 기준)
+====================================================
+힉스필드 유료 구독이 있어야 해요. API 키는 필요 없어요(로그인으로 연결).
+MCP 주소:  https://mcp.higgsfield.ai/mcp
+
+① claude.ai / Claude 데스크톱 앱 (가장 쉬움 — 힉스필드 공식 안내)
+   1. claude.ai(또는 데스크톱 앱) → 설정 → 커넥터(Connectors) → "커스텀 커넥터 추가"
+   2. 이름: Higgsfield / URL: https://mcp.higgsfield.ai/mcp
+   3. 연결 → 힉스필드 로그인·승인 창에서 승인
+   → Claude Code도 같은 claude.ai 계정으로 로그인돼 있으면 이 커넥터가 그대로 보여요("claude.ai Higgsfield").
+
+② Claude Code에 직접 추가 (터미널 한 줄)
+     claude mcp add --transport http --scope user higgsfield https://mcp.higgsfield.ai/mcp
+   그다음 Claude Code 안에서  /mcp  → higgsfield 선택 → 브라우저에서 힉스필드 로그인·승인.
+
+③ 힉스필드 CLI 방식 (힉스필드가 Claude Code용으로 안내하는 방식, Node.js 필요)
+     npm i -g @higgsfield/cli
+     higgsfield auth login          (브라우저에서 로그인)
+     npx skills add higgsfield-ai/skills
+
+연결 확인: "내 힉스필드 크레딧 잔액 알려줘" → 숫자가 나오면 성공.
+힉스필드가 없으면 GPT 이미지로: 스킬이 섹션별 이미지 프롬프트를 써 주니 ChatGPT에 붙여넣어 만들면 돼요.
+
+====================================================
+4. 사용
+====================================================
+Claude Code에서  /selling-product-page  또는 "상세페이지 만들어줘"
+흐름: 질문 10개(5~10분) → 기획안 → 상세페이지 → 업로드 이미지 자동 생성 → 폰으로 확인 → 올리기
+결과물(작업 폴더):
+  1_기획안.md / 2_상세페이지.html / 3_업로드이미지\스마트스토어·쿠팡\(상세_전체.jpg + 조각_01.jpg…) / 4_올리는법.md / 5_배너\
+고칠 땐 "3번 섹션 문구 바꿔줘"처럼 말하면 그 부분만 고치고 이미지까지 다시 뽑아 줘요.
+
+====================================================
+5. Codex에서 쓰기
+====================================================
+Codex도 같은 SKILL.md 형식(Agent Skills)을 읽어요.
+  1. 두 폴더를 Codex 스킬 폴더에 넣습니다.
+       Windows : C:\Users\(내이름)\.agents\skills\
+       Mac     : ~/.agents/skills/
+     (특정 프로젝트에서만 쓰려면 그 프로젝트 폴더의 .agents\skills\ 에)
+     깃허브: 위 "방법 B"의 복사 대상만 .agents\skills 로 바꾸면 돼요.
+  2. Codex를 다시 켜고  /skills  로 목록 확인 → 프롬프트에  $selling-product-page  로 부르거나 "상세페이지 만들어줘".
+  3. 이미지:
+     · 힉스필드 — Codex에 MCP 추가:
+         codex mcp add higgsfield --url https://mcp.higgsfield.ai/mcp
+         codex mcp login higgsfield      (브라우저에서 로그인)
+       또는 ChatGPT 플러그인 디렉터리의 Higgsfield 플러그인을 추가(ChatGPT·Codex 공용).
+     · 또는 GPT 이미지 — 스킬이 써 준 프롬프트로 ChatGPT에서 만들어 images\ 에 넣기.
+  참고: 스킬 문서는 Claude 기준(도구 이름 등)으로 쓰여 있어요. Codex에선 같은 역할의 도구를 찾아 쓰고,
+        Python 스크립트(이미지 뽑기·쇼핑몰 변환)는 그대로 돌아가요.
+
+====================================================
+6. 참고
+====================================================
+- 템플릿 4종: 연출형(질감·소품) / 정보설득형(표·숫자) / 매거진형(큰 사진·여백) / 실사형(사장님 실사·안내문).
+  카테고리 15개별 디자인 결이 미리 들어 있어요.
+- 스마트스토어는 상세가 4,000px를 넘으면 앞 3,000px만 먼저 보여요. 템플릿이 1~2번 섹션을 그 안에 맞춰 두었고,
+  이미지 뽑을 때 3번 섹션 시작 위치를 자동으로 확인해 줘요.
+- 쿠팡 이미지에선 가격·할인·무료배송 문구가 자동으로 빠져요(스마트스토어 이미지엔 남음).
+- 자사몰(카페24 등)은 HTML 그대로 넣기 — 스킬이 assets/scope_for_mall.py로 몰 스킨에 안 깨지게 바꿔 줘요.
+- 식품·화장품·건강식품 금지 표현은 스킬이 걸러 주지만 최종 확인은 본인 책임이에요.
+- impeccable 라이선스: Apache 2.0 (impeccable/LICENSE)
+
+[바뀐 것 — 2026-11-21]
+- 템플릿 4종, 긴 상세(16,384px↑) 끝까지 캡처, Windows 한글 콘솔 오류 해결, 자사몰 전용 --platform mall
+- 후기·근거 없을 때 대체 블록, 사진 장수 변형, 질문지에 배송·교환·필수 표기 추가, 쿠팡 혜택 문구 자동 제외

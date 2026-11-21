@@ -1,0 +1,124 @@
+/* =====================================================================
+   fonts.css — 분위기별 폰트 블록
+   사용법: 아래 블록 중 **하나만** 골라서 template.html <style> 맨 위에 붙인다.
+   (@import는 <style> 안에서 가장 먼저 와야 한다)
+   그리고 <div class="page" data-font="clean"> 처럼 data-font 값을 맞춘다.
+   전부 무료 상업용 · CDN 확인됨 (2026-10-27) · 자세한 건 references/fonts.md
+   ===================================================================== */
+
+
+/* ---------- clean : 깔끔 · 전문적 · 믿음직 (기본값) ---------- */
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/Pretendard/subsets/Pretendard-dynamic-subset.css');
+.page[data-font="clean"]{
+  --font-display:'Pretendard',-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  --font-body:'Pretendard',-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  --display-weight:800; --display-tracking:-.025em;
+}
+
+
+/* ---------- modern : 세련 · 트렌디 · 요즘 ---------- */
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css');
+.page[data-font="modern"]{
+  --font-display:'Paperlogy',-apple-system,"Noto Sans KR",sans-serif;
+  --font-body:'Paperlogy',-apple-system,"Noto Sans KR",sans-serif;
+  --display-weight:800; --display-tracking:-.03em;
+}
+
+
+/* ---------- round : 귀여운 · 친근 · 부드러운 ---------- */
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/Cafe24Ssurround/subsets/Cafe24Ssurround-dynamic-subset.css');
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/NanumSquareRound/subsets/NanumSquareRound-dynamic-subset.css');
+.page[data-font="round"]{
+  --font-display:'Cafe24 Ssurround','Nanum Square Round',sans-serif;
+  --font-body:'Nanum Square Round',-apple-system,"Noto Sans KR",sans-serif;
+  --display-weight:400; --display-tracking:-.01em;   /* 써라운드는 1종 — 굵기 400 그대로 */
+}
+
+
+/* ---------- kids : 아동 · 장난감 · 명랑 ---------- */
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/BMJUA/subsets/BMJUA-dynamic-subset.css');
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/NanumSquareRound/subsets/NanumSquareRound-dynamic-subset.css');
+.page[data-font="kids"]{
+  --font-display:'BM JUA','Nanum Square Round',sans-serif;
+  --font-body:'Nanum Square Round',-apple-system,"Noto Sans KR",sans-serif;
+  --display-weight:400; --display-tracking:0;
+}
+
+
+/* ---------- warm : 따뜻 · 정겨운 · 손맛 ---------- */
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/Cafe24Simplehae/subsets/Cafe24Simplehae-dynamic-subset.css');
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/NanumSquareNeo/subsets/NanumSquareNeo-dynamic-subset.css');
+.page[data-font="warm"]{
+  --font-display:'Cafe24 Simplehae','Nanum Square Neo',sans-serif;
+  --font-body:'Nanum Square Neo',-apple-system,"Noto Sans KR",sans-serif;
+  --display-weight:400; --display-tracking:0;
+}
+
+
+/* ---------- bold : 강한 임팩트 · 프로모션 · 쿠팡 스타일 ---------- */
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/Jalnan/subsets/Jalnan-dynamic-subset.css');
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/Pretendard/subsets/Pretendard-dynamic-subset.css');
+.page[data-font="bold"]{
+  --font-display:'Jalnan','Pretendard',sans-serif;
+  --font-body:'Pretendard',-apple-system,"Noto Sans KR",sans-serif;
+  --display-weight:400; --display-tracking:-.01em;
+}
+/* Jalnan은 굵기가 하나뿐 → 제목 앞 가는 글씨(.lt 300)는 본문 폰트로 */
+.page[data-font="bold"] .lt{font-family:var(--font-body);font-weight:300}
+
+
+/* ---------- luxe : 고급 · 우아 · 명조 ---------- */
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/subsets/MaruBuri-dynamic-subset.css');
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/Pretendard/subsets/Pretendard-dynamic-subset.css');
+.page[data-font="luxe"]{
+  --font-display:'Maru Buri','Noto Serif KR',serif;
+  --font-body:'Pretendard',-apple-system,"Noto Sans KR",sans-serif;
+  --display-weight:600; --display-tracking:-.01em;
+}
+
+
+/* ---------- editorial : 지적 · 차분 · 읽는 맛 ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&family=Gowun+Batang:wght@400;700&display=swap');
+.page[data-font="editorial"]{
+  --font-display:'Noto Serif KR','Maru Buri',serif;
+  --font-body:'Gowun Batang','RIDI Batang',serif;
+  --display-weight:700; --display-tracking:-.015em;
+}
+/* editorial은 본문이 명조라 폰에서 작아 보임 → 본문을 한 단계 키우고 줄높이 1.8. 고정 px 대신 cqw 비례(--fs-body) 유지 (2026-11-20) */
+.page[data-font="editorial"] p,.page[data-font="editorial"] li{font-size:max(18px,calc(var(--fs-body) * 1.1));line-height:1.8}
+
+
+/* ---------- tech : 기술 · 정확 · 숫자 ---------- */
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/GmarketSans/subsets/GmarketSans-dynamic-subset.css');
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/SpoqaHanSansNeo/subsets/SpoqaHanSansNeo-dynamic-subset.css');
+.page[data-font="tech"]{
+  --font-display:'Gmarket Sans','Pretendard',sans-serif;
+  --font-body:"Spoqa Han Sans Neo",-apple-system,"Noto Sans KR",sans-serif;
+  --display-weight:700; --display-tracking:-.02em;
+}
+
+
+/* ---------- sport : 역동 · 강함 · 속도 ---------- */
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/Giants/subsets/Giants-dynamic-subset.css');
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/Pretendard/subsets/Pretendard-dynamic-subset.css');
+.page[data-font="sport"]{
+  --font-display:'Giants','Jalnan Gothic',sans-serif;
+  --font-body:'Pretendard',-apple-system,"Noto Sans KR",sans-serif;
+  --display-weight:700; --display-tracking:-.02em;
+}
+
+
+/* ---------- retro : 레트로 · 뉴트로 · 간판 ---------- */
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/BMEULJIRO/subsets/BMEULJIRO-dynamic-subset.css');
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/Pretendard/subsets/Pretendard-dynamic-subset.css');
+.page[data-font="retro"]{
+  --font-display:'BM EULJIRO','KCC Ganpan',sans-serif;
+  --font-body:'Pretendard',-apple-system,"Noto Sans KR",sans-serif;
+  --display-weight:400; --display-tracking:0;
+}
+
+
+/* ---------- 손글씨 강조 한 줄 (어느 블록에나 추가 가능) ----------
+   첫 화면 보조 문구나 후기 인용 한 줄에만. 본문에 쓰지 않는다. */
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/NanumPen/subsets/NanumPen-dynamic-subset.css');
+.hand{font-family:'Nanum Pen','Nanum Pen Script',cursive;font-size:1.35em;font-weight:400;letter-spacing:0}

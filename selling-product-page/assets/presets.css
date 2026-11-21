@@ -1,0 +1,98 @@
+/* =====================================================================
+   presets.css — 카테고리별 기본 디자인 결
+   template.html의 <style> 안, 테마 변수 아래에 붙인다. (전체 다 붙여도 가볍다 — 변수만 있음)
+   적용: <div class="page" data-theme="clean" data-font="warm" data-preset="food">
+   우선순위(SKILL.md "결 정하는 순서"): 사장님 레퍼런스·직접 요청 > Q9-2 결 > 이 카테고리 프리셋 > 템플릿 기본값.
+   단 실사형(template-maker)은 warm 바탕·강조색(--bg·--bg-2·--fg·--fg-2·--line·--accent)이 템플릿 정체성이라
+   템플릿이 이 파일 아래에서 되돌린다 — 프리셋에서는 사진 비율·모서리·카테고리 디테일만 받는다.
+   (프리셋 색을 쓰고 싶으면 실사형에서 data-theme="clean"으로 바꾼다.)
+   폰트 블록은 assets/fonts.css에서 해당 data-font 블록을 가져온다.
+   색·디테일 규칙: references/design-presets.md / 섹션별 블록 레시피: references/layout-refs.md
+   (2026-10-29 쿠팡·컬리·무신사 15개 카테고리 상위 상세페이지 조사 반영)
+   ===================================================================== */
+
+/* 1 패션의류/잡화 — 여백·사진·작은 글자·각진 모서리. 무신사: 5:6 누끼/모델컷 세로 나열, 글자 최소 */
+.page[data-preset="fashion"]{--bg:#ffffff;--bg-2:#f4f4f2;--fg:#111318;--fg-2:#6b6f76;--accent:#111318;--accent-fg:#ffffff;--line:#e6e6e3;--shadow:none;--radius:0px;--radius-card:4px;
+  --fs-h1:clamp(24px,5.4cqw,46px);--fs-h2:clamp(20px,4.6cqw,38px);--display-weight:600;--py:clamp(56px,13cqw,112px)}
+.page[data-preset="fashion"] .hero img,.page[data-preset="fashion"] .hero .ph{aspect-ratio:5/6}
+.page[data-preset="fashion"] .eb{letter-spacing:.36em}
+
+/* 2 뷰티 — 흰 바탕, 숫자 주인공, 강조 1색. 닥터지: 4:5 세로 + 시험결과 2열 표 + 각주 */
+.page[data-preset="beauty"]{--bg:#ffffff;--bg-2:#f3f6fb;--fg:#111318;--fg-2:#5c6370;--accent:#2563eb;--accent-fg:#ffffff;--line:#e2e8f0;--fs-big:clamp(64px,16cqw,136px)}
+.page[data-preset="beauty"] .cmp td{font-weight:400}
+
+/* 3 출산/유아동 — 파스텔, 둥근 20px, 부드러운 그림자. 궁중비책: 민트 블록 교차 + 큰 숫자 + 인증 */
+.page[data-preset="baby"]{--bg:#fffaf5;--bg-2:#fdeee4;--fg:#3b2f2a;--fg-2:#7d6a60;--accent:#e4653f;--accent-fg:#ffffff;--line:#f0dccf;--shadow:0 8px 28px rgba(228,101,63,.12);--radius:16px;--radius-card:20px}
+.page[data-preset="baby"] .hero img,.page[data-preset="baby"] .wide img,.page[data-preset="baby"] .imgtext{border-radius:0}   /* 풀블리드 단독컷은 각지게, 그리드만 둥글게 */
+
+/* 4 식품 — 크림색, 가로 3:2 음식컷, 손맛 제목. 비비고·컬리: 글 위 → 4:3·3:2 사진 아래, 조리법 단계, 치수 비교 */
+.page[data-preset="food"]{--bg:#fffaf3;--bg-2:#f8ecdc;--fg:#2f2416;--fg-2:#7a6650;--accent:#c2410c;--accent-fg:#ffffff;--line:#ead9c4}
+.page[data-preset="food"] .hero img,.page[data-preset="food"] .hero .ph{aspect-ratio:3/2}     /* 식품 첫 화면은 가로 — 음식이 화면 가득 */
+.page[data-preset="food"] h3{font-family:var(--font-body);font-weight:700}
+.page[data-preset="food"] table,.page[data-preset="food"] .summary,.page[data-preset="food"] .step{background:#ffffff}
+.page[data-preset="food"] .summary{padding:clamp(4px,1cqw,8px) clamp(16px,4cqw,32px);border-radius:var(--radius-card,12px)}   /* 흰 면을 깔면 글이 가장자리에 붙지 않게 안쪽 여백 */
+.page[data-preset="food"] .summary dd:last-of-type,.page[data-preset="food"] .summary dt:last-of-type{border-bottom:0}
+
+/* 5 주방용품 — 깔끔, 청록, 아이콘 호환 줄. 아띠홈: 주방 연출 4:5 + 체크포인트 아이콘 6개 + 밝은 사진 위 어두운 글자 */
+.page[data-preset="kitchen"]{--bg:#ffffff;--bg-2:#eef5f4;--fg:#111318;--fg-2:#5c6370;--accent:#0f766e;--accent-fg:#ffffff;--line:#d9e7e5}
+.page[data-preset="kitchen"] .icons{background:var(--bg-2);padding-top:var(--gap);padding-bottom:var(--gap)}
+
+/* 6 생활용품 — 쿠팡 결: 숫자·1위·비교표·빨강. 순수한면: 하늘색 블록 + 다이어그램 콜아웃 + 말풍선 박스 */
+.page[data-preset="living"]{--bg:#ffffff;--bg-2:#fff1f1;--fg:#111318;--fg-2:#5c6370;--accent:#dc2626;--accent-fg:#ffffff;--line:#f5d5d5;--radius-card:14px}
+.page[data-preset="living"] .badge b{font-size:clamp(28px,7cqw,60px)}
+.page[data-preset="living"] .cmp td.ours{background:#fff1f1}
+.page[data-preset="living"] h2{font-family:var(--font-body);font-weight:800}   /* living + bold(Jalnan): Jalnan 제목은 1·4·11번만(design-presets.md) */
+.page[data-preset="living"] :is(.s-01,.s-04,.s-11) h2{font-family:var(--font-display);font-weight:var(--display-weight)}
+
+/* 7 홈인테리어 — 뉴트럴, 얇은 제목, 넓은 여백. 아크디: 색상 나열 와이드 + 스토리 중앙 + 시험성적서 */
+.page[data-preset="interior"]{--bg:#faf9f7;--bg-2:#f0ede8;--fg:#2b2622;--fg-2:#7a716a;--accent:#6b5b4e;--accent-fg:#ffffff;--line:#e4dfd8;--shadow:none;
+  --display-weight:600;--display-tracking:-.02em;--py:clamp(56px,13cqw,120px)}
+.page[data-preset="interior"] .hero img,.page[data-preset="interior"] .hero .ph{aspect-ratio:4/3}   /* 공간 연출은 가로 */
+
+/* 8 가전디지털 — 흰 바탕, 큰 스펙 숫자, 각진 고딕. 삼성: 공간 와이드 + 분해도 + 사진/글 split 교차 ×3 + 각주 */
+.page[data-preset="tech"]{--bg:#ffffff;--bg-2:#f1f4f9;--fg:#0f172a;--fg-2:#475569;--accent:#1d4ed8;--accent-fg:#ffffff;--line:#dbe2ee;--radius-card:10px;--fs-big:clamp(48px,12cqw,100px)}
+.page[data-preset="tech"] .hero img,.page[data-preset="tech"] .hero .ph{aspect-ratio:4/3}
+.page[data-preset="tech"] .split .pic img,.page[data-preset="tech"] .split .pic .ph{aspect-ratio:1/1}   /* 기능 블록은 정사각 제품 클로즈업 */
+.page[data-preset="tech"] .split{background:var(--bg-2);padding-top:var(--gap);padding-bottom:var(--gap)}
+.page[data-preset="tech"] td,.page[data-preset="tech"] th{font-size:var(--fs-sub)}
+
+/* 9 스포츠/레저 — 다크 + 주황, 굵은 제목 (data-theme="luxe"와 함께). 요가매트: 4:5 세로 + 상단 텍스트 오버레이 + 아이콘 2×2 */
+.page[data-preset="sport"]{--bg:#121212;--bg-2:#1c1c1e;--fg:#f4f1ea;--fg-2:#b8b3a7;--accent:#f59e0b;--accent-fg:#121212;--line:#2c2c2e;--shadow:none;--fs-h1:clamp(36px,8.6cqw,76px)}
+.page[data-preset="sport"] p,.page[data-preset="sport"] li{line-height:1.7;letter-spacing:.01em;font-weight:500}
+.page[data-preset="sport"] .badge,.page[data-preset="sport"] .review,.page[data-preset="sport"] .step,.page[data-preset="sport"] .qa > div{background:#232325;border:0}
+.page[data-preset="sport"] .imgtext .scrim{background:linear-gradient(180deg,rgba(0,0,0,.82) 0%,rgba(0,0,0,.45) 50%,rgba(0,0,0,0) 80%)}
+
+/* 10 자동차용품 — 남색, 정확, 절제. 피에브: 정품 판매처 배너 + 구매 전 확인 박스 + 호환표가 앞 */
+.page[data-preset="auto"]{--bg:#ffffff;--bg-2:#eef1f5;--fg:#0f172a;--fg-2:#475569;--accent:#1e293b;--accent-fg:#ffffff;--line:#d7dde6;--radius-card:10px}
+.page[data-preset="auto"] .callout li{border-color:var(--accent)}
+
+/* 11 도서/음반 — 종이색, 명조, 책 그림자. 편의점: 표지 + 세로 타이포 + 인용(대사) 교차 + 추천사 박스 */
+.page[data-preset="book"]{--bg:#fdfcf9;--bg-2:#f3efe6;--fg:#2a2420;--fg-2:#6f655c;--accent:#7c2d12;--accent-fg:#ffffff;--line:#e6dfd2;--radius-card:6px}
+.page[data-preset="book"] .hero img,.page[data-preset="book"] .hero .ph{aspect-ratio:2/3;max-width:60%;margin:0 auto;box-shadow:0 12px 32px rgba(0,0,0,.16)}
+.page[data-preset="book"] .quote{font-family:var(--font-display)}
+.page[data-preset="book"] p,.page[data-preset="book"] li{line-height:1.8}
+
+/* 12 완구/취미 — 컬러풀, 노랑 보조, 둥근 20px (data-theme="pop"과 함께). 레고: 박스 정면 1:1 + 측면·내용물 나열, KC·연령 */
+.page[data-preset="toy"]{--bg:#ffffff;--bg-2:#fff0f6;--fg:#1a1023;--fg-2:#6d5a7a;--accent:#e0317e;--accent-2:#facc15;--accent-fg:#ffffff;--line:#f3d6e4;--shadow:0 6px 20px rgba(224,49,126,.12);--radius:16px;--radius-card:20px}
+.page[data-preset="toy"] .hero img,.page[data-preset="toy"] .hero .ph{aspect-ratio:1/1;border-radius:0}
+.page[data-preset="toy"] .badge{background:var(--accent-2);color:#1a1023;border:0}
+.page[data-preset="toy"] .badge b{color:#1a1023}
+.page[data-preset="toy"] .notice{background:#ffffff}
+
+/* 13 문구/오피스 — 파스텔 보라, 정갈. 모더너리: 스펙 알약 4개 + 색상 9종 3열 1:1 그리드 + 책상 연출 4:3 */
+.page[data-preset="stationery"]{--bg:#ffffff;--bg-2:#f5f3ff;--fg:#1e1b2e;--fg-2:#6b6480;--accent:#7c3aed;--accent-fg:#ffffff;--line:#e4dcf7;--radius:8px}
+.page[data-preset="stationery"] .hero img,.page[data-preset="stationery"] .wide img,.page[data-preset="stationery"] .imgtext{border-radius:0}
+
+/* 14 반려동물 — 따뜻한 노랑·베이지, 둥근. 굿데이: 패키지 1:1 + 알약 제목 + 실측(자) 사진 2열 + 캡션 */
+.page[data-preset="pet"]{--bg:#fffbf2;--bg-2:#fdf0d5;--fg:#3b2f1a;--fg-2:#7d6a45;--accent:#d97706;--accent-fg:#ffffff;--line:#f0e2c4;--shadow:0 6px 20px rgba(217,119,6,.12);--radius:14px;--radius-card:18px}
+.page[data-preset="pet"] .hero img,.page[data-preset="pet"] .hero .ph{aspect-ratio:1/1;border-radius:0}
+.page[data-preset="pet"] .pills span{background:var(--accent);color:var(--accent-fg)}
+
+/* 15 헬스/건강식품 — 흰, 초록, 장식 없음. 락토핏: 인증 마크 + "1등" 각주 + 성분 히스토리 리스트(썸네일+체크) */
+.page[data-preset="health"]{--bg:#ffffff;--bg-2:#f0f7f2;--fg:#111318;--fg-2:#4b5563;--accent:#15803d;--accent-fg:#ffffff;--line:#d6e8dc;--shadow:none;--radius-card:10px}
+.page[data-preset="health"] .notice-list li{color:#374151}
+.page[data-preset="health"] .fn{color:#374151}
+
+/* 공통 예외 — 선물세트 / 할인행사 (프리셋 위에 덧씌움) */
+.page[data-gift="true"]{--accent:#c9a961;--accent-fg:#121212}
+.page[data-sale="true"]{--accent:#dc2626;--accent-fg:#ffffff}

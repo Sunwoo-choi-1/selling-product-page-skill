@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{상품명}} 상세페이지</title>
+<style>
+  /* =========================================================
+     [1] 폰트: assets/fonts.css 에서 data-font 블록 하나를 여기(맨 위)에 붙인다.
+         @import 는 반드시 style 태그 안 첫 줄이어야 한다.
+     ========================================================= */
+  @import url('https://cdn.jsdelivr.net/gh/fonts-archive/Pretendard/subsets/Pretendard-dynamic-subset.css');
+  .page[data-font="clean"]{
+    --font-display:'Pretendard',-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    --font-body:'Pretendard',-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    --display-weight:800; --display-tracking:-.025em;
+  }
+
+  /* =========================================================
+     [2] 테마: data-theme="clean|warm|luxe|pop"  (Q9 분위기)
+     [3] 프리셋: assets/presets.css 전체를 아래 "프리셋 붙이는 자리" 표지 줄 밑에 붙이고 data-preset="food" 등 지정
+         → 결 우선순위: 사장님 레퍼런스·직접 요청 > Q9-2 결 > 카테고리 프리셋 > 이 템플릿 기본값 (references/design-presets.md)
+     [4] 레이아웃: 연출형의 기본 블록은 "연출 블록"(.scene 첫 화면 · .seals 신뢰 · .ask 공감 · .stamp 장점 · .dots 단계 — 아래 연출 블록 주석).
+         사진 블록 9종(hero 4:5 · wide 4:3 · split 3:4+글 · pair 1:1×2 · mosaic · lineup · stack · imgtext 16:10 · icons/steps)은
+         연출 블록 대신 쓰거나 그 사이에 끼우는 대안이다. layout-refs.md 카테고리 레시피의 비율(예: 식품 3:2)은 .wide.w32 처럼 이 블록 변형으로 옮긴다.
+         정사각(1:1)은 pair·lineup·mosaic 처럼 "여러 장 나열"할 때만. 단독 이미지는 절대 1:1이 아니다.
+     [5] 본문 갈아 끼우기: 본문 시작·끝 표지(.page 바로 안쪽 첫 줄·마지막 줄 주석) 사이만 바꾼다(주석 안 예시 문자열로 위치를 찾지 않는다).
+     적용 예: div.page 에 data-theme="warm" data-font="warm" data-preset="food"
+     ========================================================= */
+  .page{
+    --font-display:'Pretendard',sans-serif; --font-body:'Pretendard',sans-serif;
+    --display-weight:800; --display-tracking:-.025em;
+    --w:860px;               /* 스마트스토어·자사몰 860 / 쿠팡 780 / 인스타 1080 */
+    --bg:#ffffff;            /* 바탕 */
+    --bg-2:#f4f5f7;          /* 올라온 면 (교차 섹션) */
+    --fg:#111318;            /* 본문 글자 */
+    --fg-2:#5c6370;          /* 보조 글자 (대비 4.5:1 이상) */
+    --accent:#1b4fd8;        /* 강조 — 핵심 숫자·체크·키워드에만 */
+    --accent-fg:#ffffff;     /* 강조 위 글자 */
+    --line:#e3e6ea;          /* 구분선 */
+    --shadow:none;           /* 기본 플랫. 프리셋(baby·toy 등)만 그림자 */
+    --radius:0px;            /* 이미지 모서리 기본 0. 카드류(.badge .review .qa)만 --radius-card */
+    --radius-card:12px;
+
+    /* 글자 — 페이지 폭(cqw)에 비례. 430px 폰 = 최소값, 860px = 최대값.
+       폰 캡처(430px, 2배)와 PC 미리보기(860px)에서 같은 비율로 보인다. */
+    --fs-h1:clamp(32px,7.8cqw,68px);
+    --fs-h2:clamp(25px,5.8cqw,50px);
+    --fs-h3:clamp(19px,4.4cqw,38px);
+    --fs-lead:clamp(17px,3.7cqw,32px);
+    --fs-body:clamp(16px,3.5cqw,28px);
+    --fs-sub:clamp(16px,3cqw,24px);     /* 설명 글 — 430폭에서도 16px 아래로 내려가지 않는다 */
+    --fs-eb:clamp(12px,2.6cqw,20px);   /* 보조 글자(라벨·태그·각주·캡션·브랜드바)만 12px까지 — 본문·설명은 16px↑ */
+    --fs-cap:clamp(12px,2.6cqw,20px);
+    --fs-kw:clamp(14px,3.2cqw,26px);
+    --fs-big:clamp(56px,14cqw,120px);
+
+    /* 여백 — 섹션 세로 --py, 글 좌우 --px, 글↔이미지 --gap, 그리드 틈 --gap-s */
+    --px:clamp(22px,5.6cqw,48px);
+    --py:clamp(48px,11cqw,96px);
+    --gap:clamp(20px,5cqw,44px);
+    --gap-s:clamp(8px,2cqw,16px);
+    container-type:inline-size;
+  }
+  @supports not (width:1cqw){
+    .page{--fs-h1:clamp(32px,7.8vw,68px);--fs-h2:clamp(25px,5.8vw,50px);--fs-h3:clamp(19px,4.4vw,38px);
+          --fs-lead:clamp(17px,3.7vw,32px);--fs-body:clamp(16px,3.5vw,28px);--fs-sub:clamp(16px,3vw,24px);
+          --fs-eb:clamp(12px,2.6vw,20px);--fs-cap:clamp(12px,2.6vw,20px);--fs-kw:clamp(14px,3.2vw,26px);--fs-big:clamp(56px,14vw,120px);
+          --px:clamp(22px,5.6vw,48px);--py:clamp(48px,11vw,96px);--gap:clamp(20px,5vw,44px);--gap-s:clamp(8px,2vw,16px)}
+  }
+  .page[data-theme="warm"]{
+    --bg:#fffaf3; --bg-2:#f8ecdc; --fg:#2f2416; --fg-2:#7a6650;
+    --accent:#c2410c; --line:#ead9c4;
+  }
+  .page[data-theme="luxe"]{
+    --bg:#121212; --bg-2:#1c1c1e; --fg:#f4f1ea; --fg-2:#b5ae9f;
+    --accent:#c9a961; --accent-fg:#121212; --line:#2c2c2e;
+  }
+  .page[data-theme="pop"]{
+    --bg:#ffffff; --bg-2:#fff0f6; --fg:#1a1023; --fg-2:#6d5a7a;
+    --accent:#e0317e; --line:#f3d6e4;
+  }
+  /* PRESETS:PASTE-HERE — assets/presets.css 전체를 이 줄 아래에 붙인다 */
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{background:#e9ebee;color:var(--fg);line-height:1.65;word-break:keep-all;overflow-wrap:break-word}  /* anywhere 는 flex 안에서 단어 중간을 끊는다 */
+  .page{max-width:var(--w);margin:0 auto;background:var(--bg);color:var(--fg);font-family:var(--font-body);font-weight:400;overflow-x:hidden}
+  /* 그리드 열은 전부 minmax(0,1fr) — keep-all 때문에 긴 단어가 열을 밀어 페이지가 옆으로 넘치는 걸 막는다 */
+  ::selection{background:var(--accent);color:var(--accent-fg)}
+  a{color:var(--accent);text-underline-offset:.2em}
+  a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* ---------- 섹션 리듬: 섹션은 세로 여백만. 좌우 여백은 .tx(글)·그리드가 각자 가진다 → 단독 이미지는 자연히 풀블리드 ---------- */
+  .s{padding:var(--py) 0}
+  .s.alt{background:var(--bg-2)}
+  .s.tight{padding-top:calc(var(--py) * .6)}
+  .tx{padding:0 var(--px)}
+  .tx > * + *{margin-top:clamp(12px,2.8cqw,22px)}
+  .tx + .pic,.tx + .wide,.tx + .hero,.tx + .split,.tx + .pair,.tx + .mosaic,.tx + .imgtext,.tx + .lineup,.tx + .stack,.tx + .icons,.tx + .steps,.tx + .badges,
+  .wide + .tx,.hero + .tx,.split + .tx,.pair + .tx,.mosaic + .tx,.imgtext + .tx,.lineup + .tx,.stack + .tx,.icons + .tx,.steps + .tx,.badges + .tx{margin-top:var(--gap)}
+  .center{text-align:center}
+  /* 사진 표기 — 사진 자리마다 하나. .cap = "실물 촬영 · …" / .cap.ai = "연출 이미지(AI 활용) · …" (모양은 같고 문구로 구분) */
+  .cap{padding:10px var(--px) 0;text-align:right;font-size:var(--fs-cap);color:var(--fg-2)}
+  .cap.ai{font-style:normal}
+  .cap.l{text-align:left}
+
+  /* ---------- 글자 역할 ---------- */
+  h1,h2,h3{font-family:var(--font-display);font-weight:var(--display-weight);letter-spacing:var(--display-tracking);text-wrap:balance}
+  h1{font-size:var(--fs-h1);line-height:1.22}
+  h2{font-size:var(--fs-h2);line-height:1.3}
+  h3{font-size:var(--fs-h3);line-height:1.35}
+  p,li,dd,td,th{font-size:var(--fs-body)}
+  p{color:var(--fg-2)}
+  .tx h1 + p,.tx h2 + p,.tx h3 + p{margin-top:clamp(8px,2cqw,14px)}   /* 제목 위 여백 > 아래 여백 */
+  .lead{font-size:var(--fs-lead);color:var(--fg-2);line-height:1.55}
+  .sub{font-size:var(--fs-sub);color:var(--fg-2)}
+  .fg{color:var(--fg)}
+  .ac{color:var(--accent);font-style:normal}
+  .num{font-variant-numeric:tabular-nums}
+  /* 키워드(눈썹) — 한글 2~6자 또는 "01 · 키워드". 영문 대문자 라벨(POINT, FEATURE)은 금지 (design.md) */
+  /* .eb(제목 위 눈썹 라벨)는 쓰지 않는다 — impeccable craft-floor 금지 항목. 아래 규칙은 예전 결과물 호환용으로만 남김 */
+  .eb{font-size:var(--fs-eb);letter-spacing:.28em;font-weight:700;color:var(--accent);line-height:1}
+  .eb + h1,.eb + h2,.eb + h3{margin-top:clamp(12px,2.8cqw,22px)}
+  /* 짧은 강조선 — 가운데 정렬 섹션 제목 아래. 페이지 전체에서 최소 3곳, 최대 5곳 */
+  .divider{border:0;width:48px;height:3px;background:var(--accent);margin:clamp(14px,3cqw,24px) auto 0}
+  .tx:not(.center) .divider{margin-left:0}
+
+  /* ---------- 상단 브랜드 줄 ---------- */
+  .brandbar{display:flex;justify-content:space-between;align-items:baseline;margin:0 var(--px) var(--gap);
+            padding:clamp(18px,4.2cqw,36px) 0 clamp(14px,3.4cqw,28px);border-bottom:1px solid var(--line)}
+  .brandbar b{flex:none;font-weight:800;letter-spacing:.16em;font-size:clamp(14px,3cqw,24px)}
+  .brandbar span{min-width:0;text-align:right;font-size:var(--fs-eb);letter-spacing:.2em;color:var(--fg-2)}
+
+  /* ---------- 이미지 공통 ---------- */
+  img{display:block;width:100%;height:auto;background:var(--bg-2);object-fit:cover;border-radius:var(--radius)}
+  .ph{width:100%;background:var(--bg-2);border:1px dashed var(--line);border-radius:var(--radius);
+      display:flex;align-items:center;justify-content:center;color:var(--fg-2);font-size:14px;text-align:center;padding:20px}
+
+  /* ---------- 이미지 블록 9종 — 비율은 블록이 정한다 ----------
+     hero   4:5  단독 세로 (첫 화면·해결·제품 단독)  .r34=3:4 .r56=5:6(패션) .sq=1:1(패키지·박스) .book=2:3(표지, 60% 폭)
+     wide   4:3  단독 가로 (음식·공간·분해도·플랫레이) .w32=3:2(식품) .w169=16:9(배너)
+     split  3:4 사진 + 글 2열 (.rev = 사진 오른쪽). 글↔사진 교차의 기본
+     pair   1:1 × 2열 (디테일 2장·선물컷·시험성적서) .contain = 흰 배경 누끼
+     mosaic 1:1 × 2 + 세로 긴 1장 (실물 콜라주)
+     lineup 1:1 × 2열 + 캡션 (옵션·색상·구성품) .c3 = 3열  .info = 한 줄 특징 + 스펙 알약을 더한 옵션 카드(아래 선택 블록)
+     stack  세로 나열, 비율 자유 (패션 모델컷·미리보기 페이지)
+     imgtext 16:10 사진 + 스크림 + 글 오버레이 (공감·배너) .tall=4:5 .bottom=글 아래 .light=밝은 사진 위 어두운 글자
+     icons / steps 는 이미지가 아니라 정보 블록 (아래) */
+  .hero img,.hero .ph{aspect-ratio:4/5}
+  .hero.r34 img,.hero.r34 .ph{aspect-ratio:3/4}
+  .hero.r56 img,.hero.r56 .ph{aspect-ratio:5/6}
+  .hero.sq img,.hero.sq .ph{aspect-ratio:1/1}
+  .hero.book img,.hero.book .ph{aspect-ratio:2/3;max-width:60%;margin:0 auto;box-shadow:0 12px 32px rgba(0,0,0,.16)}
+  .hero.inset,.wide.inset{padding:0 var(--px)}            /* 풀블리드 대신 여백 안에 (그리드·표 옆) */
+  .wide img,.wide .ph{aspect-ratio:4/3}
+  .wide.w32 img,.wide.w32 .ph{aspect-ratio:3/2}
+  .wide.w169 img,.wide.w169 .ph{aspect-ratio:16/9}
+
+  .split{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:var(--gap-s);align-items:center;padding:0 var(--px)}
+  .split.rev{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr)}
+  .split.rev .pic{order:2}
+  .split .pic img,.split .pic .ph{aspect-ratio:3/4}
+  .split .tx{padding:0 0 0 clamp(6px,1.6cqw,14px)}
+  .split.rev .tx{padding:0 clamp(6px,1.6cqw,14px) 0 0}
+  .split .tx > * + *{margin-top:clamp(8px,2cqw,16px)}
+  .split h2{font-size:clamp(22px,5cqw,44px)}
+  .split p{font-size:var(--fs-sub)}
+
+  .pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap-s);padding:0 var(--px)}
+  .pair img,.pair .ph{aspect-ratio:1/1}
+  .pair.contain img{object-fit:contain;background:#fff}
+  .pair figure{display:block}
+  .pair figcaption{padding-top:clamp(12px,3cqw,24px)}
+  .pair figcaption > * + *{margin-top:clamp(6px,1.6cqw,12px)}
+  .pair h3{font-size:clamp(17px,4cqw,34px)}
+  .pair p{font-size:var(--fs-sub)}
+
+  .mosaic{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:var(--gap-s);padding:0 var(--px)}
+  .mosaic img,.mosaic .ph{aspect-ratio:1/1}
+  .mosaic .tall{grid-row:span 2;min-height:0}
+  .mosaic .tall img,.mosaic .tall .ph{height:100%;aspect-ratio:auto}
+
+  .lineup{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(18px,4.4cqw,36px) var(--gap-s);padding:0 var(--px)}
+  .lineup.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .lineup img,.lineup .ph{aspect-ratio:1/1}
+  .lineup.contain img{object-fit:contain;background:#fff}
+  .lineup figcaption{padding-top:clamp(10px,2.4cqw,18px)}
+  .lineup figcaption b{display:flex;align-items:baseline;gap:.45em;font-family:var(--font-display);font-weight:var(--display-weight);font-size:clamp(17px,4cqw,34px);line-height:1.3}
+  .lineup figcaption b i{font-style:normal;font-family:var(--font-body);font-weight:800;font-size:var(--fs-cap);color:var(--accent);letter-spacing:.06em}
+  .lineup figcaption span{display:block;margin-top:4px;font-size:var(--fs-sub);color:var(--fg-2);line-height:1.5}
+  .lineup.c3 figcaption b{font-size:var(--fs-sub);font-family:var(--font-body);font-weight:700;justify-content:center}
+
+  .stack{padding:0 var(--px)}
+  .stack.full{padding:0}
+  .stack > * + *{margin-top:var(--gap-s)}
+
+  .imgtext{position:relative;overflow:hidden}
+  .imgtext img,.imgtext .ph{aspect-ratio:16/10}
+  .imgtext.tall img,.imgtext.tall .ph{aspect-ratio:4/5}
+  .imgtext .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,10,6,.74) 0%,rgba(14,10,6,.4) 50%,rgba(14,10,6,0) 80%)}
+  .imgtext .txt{position:absolute;left:var(--px);right:var(--px);top:clamp(22px,5.4cqw,46px);color:#fff}
+  .imgtext .txt b{display:block;font-family:var(--font-display);font-weight:var(--display-weight);font-size:var(--fs-h2);line-height:1.3;letter-spacing:var(--display-tracking);text-wrap:balance}
+  .imgtext .txt p{margin-top:clamp(8px,2cqw,16px);color:rgba(255,255,255,.88);font-size:var(--fs-body)}
+  .imgtext.bottom .scrim{background:linear-gradient(0deg,rgba(14,10,6,.74) 0%,rgba(14,10,6,.4) 50%,rgba(14,10,6,0) 80%)}
+  .imgtext.bottom .txt{top:auto;bottom:clamp(22px,5.4cqw,46px)}
+  .imgtext.light .scrim{background:linear-gradient(180deg,rgba(255,255,255,.72) 0%,rgba(255,255,255,.3) 45%,rgba(255,255,255,0) 75%)}
+  .imgtext.light .txt{color:var(--fg)}
+  .imgtext.light .txt p{color:var(--fg-2)}
+  .imgtext + .imgtext{margin-top:var(--gap-s)}
+
+  /* ---------- 정보 블록 ---------- */
+  /* 키워드 바 — 첫 화면 아래. "6종 골라 담기 | 미니어처 | 냉장고 자석" 처럼 3개 */
+  .kw{display:flex;justify-content:center;flex-wrap:wrap;margin:var(--gap) var(--px) 0;padding:clamp(20px,4.6cqw,40px) 0 0;border-top:1px solid var(--line);
+      font-size:var(--fs-kw);font-weight:700;letter-spacing:-.01em}
+  .kw span{padding:0 clamp(12px,3.6cqw,30px);border-left:1px solid var(--line);line-height:1.2}
+  .kw span:first-child{border-left:0}
+  .kw.kw-in{margin:var(--gap) 0 0}
+  /* 스펙 알약 — "10색상 · 200페이지 · PU가죽" (문구·가전·생활) */
+  .pills{display:flex;flex-wrap:wrap;gap:clamp(6px,1.6cqw,12px);justify-content:center}
+  .pills span{padding:.45em 1em;border-radius:999px;background:var(--bg-2);font-size:var(--fs-sub);font-weight:700;color:var(--fg)}
+  .s.alt .pills span{background:var(--bg)}
+  /* 요약 표(dl) — 구성·용량·배송. 가격은 넣지 않는다 */
+  .summary{margin:var(--gap) var(--px) 0;display:grid;grid-template-columns:auto 1fr;gap:0 clamp(16px,4cqw,32px);border-top:1px solid var(--line)}
+  .summary dt,.summary dd{padding:clamp(11px,2.6cqw,20px) 0;border-bottom:1px solid var(--line);font-size:var(--fs-body)}
+  .summary dt{color:var(--fg-2);white-space:nowrap}
+  .summary dd{font-weight:700}
+  /* 숫자 배지 — 진짜 숫자만 (누적 판매·후기 수·시험 통과) */
+  .badges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap-s);padding:0 var(--px)}
+  .badge{padding:clamp(18px,4.4cqw,36px) 8px;text-align:center;border-radius:var(--radius-card);background:var(--bg);box-shadow:var(--shadow);border:1px solid var(--line)}
+  .s.alt .badge{border:0}
+  .badge b{display:block;font-family:var(--font-display);font-size:clamp(22px,5.4cqw,46px);font-weight:800;color:var(--accent);letter-spacing:-.02em;line-height:1.1}
+  .badge span{display:block;margin-top:6px;font-size:var(--fs-sub);color:var(--fg-2)}
+  .badge img{width:min(50%,96px);margin:0 auto 8px;aspect-ratio:1/1;object-fit:contain;background:transparent}   /* 인증 마크 이미지 */
+  /* 아이콘 줄 — 호환·재질·특징 2~4개. 인라인 SVG, 이모지 금지 */
+  .icons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap-s);padding:0 var(--px);text-align:center}
+  .icons.c2{grid-template-columns:repeat(2,minmax(0,1fr))} .icons.c4{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .icons > div{padding:clamp(14px,3.4cqw,28px) 6px}
+  .icons svg{width:clamp(34px,8cqw,64px);height:auto;margin:0 auto clamp(8px,2cqw,14px);stroke:var(--accent);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .icons b{display:block;font-size:var(--fs-sub);line-height:1.35}
+  .icons span{display:block;margin-top:4px;font-size:var(--fs-cap);color:var(--fg-2)}
+  /* 단계 — 조리법·설치·사용 순서 1-2-3. 번호 + 글 + (선택) 작은 사진 */
+  .steps{display:grid;gap:var(--gap-s);padding:0 var(--px)}
+  .step{display:grid;grid-template-columns:auto 1fr;gap:clamp(12px,3cqw,22px);align-items:start;padding:clamp(16px,3.8cqw,30px);background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-card)}
+  .s.alt .step{border:0}
+  .step.pic{grid-template-columns:auto 1fr minmax(72px,28%)}
+  .step img,.step .ph{aspect-ratio:1/1;border-radius:var(--radius-card)}
+  .n{display:inline-grid;place-items:center;width:clamp(28px,6.6cqw,56px);height:clamp(28px,6.6cqw,56px);border-radius:50%;
+     background:var(--accent);color:var(--accent-fg);font-weight:800;font-size:clamp(14px,3.2cqw,26px);line-height:1}
+  .step h3{font-size:clamp(17px,4cqw,32px)}
+  .step p{margin-top:4px;font-size:var(--fs-sub)}
+  /* 장점 묶음 — .point 하나 = 번호 + 제목 + 설명 + 이미지 블록(wide/pair/split 중 택1) */
+  .point{margin-top:var(--py)}
+  .point:first-of-type{margin-top:var(--gap)}
+  .point .tx > * + *{margin-top:clamp(10px,2.4cqw,18px)}
+  .n + h3{margin-top:clamp(10px,2.4cqw,18px)}
+  /* 체크 목록 */
+  .check{list-style:none;margin-top:var(--gap)}
+  .check li{display:flex;gap:12px;align-items:flex-start;padding:clamp(11px,2.6cqw,20px) 0;border-bottom:1px solid var(--line)}
+  .check li:first-child{border-top:1px solid var(--line)}
+  .check li svg{flex:none;width:1.25em;height:1.25em;margin-top:.15em;stroke:var(--accent);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+  .check li span{font-weight:700}
+  .check.row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap-s);margin-top:var(--gap)}     /* 가로 3개 (뷰티 "장벽 케어 · 산뜻 밀착 · 민감 보호") */
+  .check.row li,.check.row li:first-child{border:0;padding:0;flex-direction:column;align-items:center;text-align:center;gap:6px}
+  /* 콜아웃 — 다이어그램 설명 (생활·가전) */
+  .callout{list-style:none;display:grid;gap:var(--gap-s);padding:0 var(--px);margin-top:var(--gap)}
+  .callout li{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;padding:clamp(12px,3cqw,22px) clamp(14px,3.4cqw,26px);border:1px solid var(--line);border-radius:var(--radius-card)}
+  .callout li b{color:var(--accent);font-weight:800;font-size:var(--fs-sub)}
+  .callout li span{font-size:var(--fs-sub)}
+  /* 인용 — 책 대사·고객 한 줄 (도서·후기) */
+  /* 한쪽 세로 바(border-left)는 impeccable 금지 패턴 → 큰 따옴표로 (2026-11-20) */
+  .quote::before{content:"\201C";display:block;font-size:2em;line-height:.6;margin-bottom:.15em;color:var(--accent)}
+  .quote{margin:var(--gap) var(--px) 0;padding:0;font-family:var(--font-display);font-weight:var(--display-weight);font-size:var(--fs-h3);line-height:1.45;color:var(--fg)}
+  .quote small{display:block;margin-top:8px;font-family:var(--font-body);font-weight:400;font-size:var(--fs-sub);color:var(--fg-2)}
+  /* 각주 — "* 2025 ○○협회 기준" 숫자·1위 주장 아래 필수 */
+  .fn{padding:clamp(10px,2.4cqw,18px) var(--px) 0;font-size:var(--fs-cap);color:var(--fg-2);line-height:1.6}
+
+  /* ---------- 6 증거 ---------- */
+  .big{font-family:var(--font-display);font-size:var(--fs-big);font-weight:900;color:var(--accent);line-height:1;letter-spacing:-.03em}
+  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;margin-top:var(--gap);border-top:1px solid var(--line)}
+  th,td{padding:clamp(13px,3cqw,24px) 0;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;line-height:1.5}
+  th{font-weight:400;color:var(--fg-2);width:30%;padding-left:clamp(4px,1.4cqw,14px)}
+  td{font-weight:700}
+  .cmp th,.cmp td{text-align:center;padding-left:0}
+  .cmp thead th{color:var(--fg);font-weight:700;font-size:var(--fs-sub)}
+  .cmp tbody th{text-align:left;padding-left:clamp(4px,1.4cqw,14px)}
+  .cmp td.ours{color:var(--accent);font-weight:800}
+  .bar{height:14px;background:var(--bg-2);border-radius:999px;overflow:hidden;margin-top:8px}
+  .bar span{display:block;height:100%;background:var(--accent);border-radius:999px;max-width:100%}
+
+  /* .criteria — "고르는 기준" 표 (R6). "일반 제품"과 비교하지 않는다. 열: 고르는 기준 / 확인할 것 / 이 상품은 */
+  .criteria thead th{font-size:var(--fs-sub);font-weight:700;color:var(--fg);padding-left:0}
+  .criteria th,.criteria td{width:auto;text-align:left;padding-right:clamp(8px,2cqw,16px)}
+  .criteria thead th:first-child,.criteria tbody th{width:30%;padding-left:clamp(4px,1.4cqw,14px)}
+  .criteria tbody th{color:var(--fg);font-weight:700}
+  .criteria td{font-weight:400;color:var(--fg-2)}
+  .criteria td.ours{color:var(--accent);font-weight:800}
+
+  /* ---------- 8 후기 ---------- */
+  .reviews{display:grid;gap:var(--gap-s);padding:0 var(--px)}
+  .review{padding:clamp(18px,4.4cqw,32px);border-radius:var(--radius-card);background:var(--bg);box-shadow:var(--shadow);border:1px solid var(--line)}
+  .s.alt .review{border:0}
+  .review .stars{display:flex;gap:2px;color:var(--accent)}
+  .review .stars svg{width:1em;height:1em;fill:currentColor}
+  .review p{margin-top:10px;color:var(--fg)}
+  .review .who{margin-top:10px;font-size:var(--fs-cap);color:var(--fg-2)}
+  .review .reply{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:var(--fs-sub);color:var(--fg-2)}
+
+  /* .fitcheck — 후기가 아직 없을 때 8번 자리 (R5). 2열 목록: 이런 분께 맞아요 / 이런 분껜 안 맞아요 (각 3개) */
+  .fitcheck{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap-s);padding:0 var(--px);margin-top:var(--gap)}
+  .fitcheck > div{padding:clamp(18px,4.4cqw,32px) clamp(14px,3.4cqw,28px);border-radius:var(--radius-card);background:var(--bg);border:1px solid var(--line)}
+  .s.alt .fitcheck > div{border:0}
+  .fitcheck h3{font-family:var(--font-body);font-weight:800;font-size:var(--fs-body);color:var(--fg)}
+  .fitcheck ul{list-style:none;margin-top:clamp(10px,2.4cqw,18px)}
+  .fitcheck li{position:relative;padding-left:1.3em;font-size:var(--fs-sub);color:var(--fg);line-height:1.5}
+  .fitcheck li + li{margin-top:clamp(8px,2cqw,14px)}
+  .fitcheck li::before{content:"";position:absolute;left:0;top:.45em;width:.6em;height:.6em;border-radius:50%;background:var(--accent)}
+  .fitcheck .no li{color:var(--fg-2)}
+  .fitcheck .no li::before{background:transparent;border:1.5px solid var(--fg-2)}
+
+  /* ---------- 10 FAQ (펼친 상태 — 이미지로 올리면 아코디언은 안 열린다) ---------- */
+  .qa{display:grid;gap:clamp(10px,2.4cqw,16px);margin-top:var(--gap)}
+  .qa > div{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-card);padding:clamp(15px,3.6cqw,28px) clamp(16px,4cqw,30px)}
+  .s.alt .qa > div{border:0}
+  .qa dt{font-weight:800;display:flex;gap:.6em;font-size:var(--fs-body);color:var(--fg)}
+  .qa dd{margin-top:8px;color:var(--fg-2);display:flex;gap:.6em;font-size:var(--fs-body)}
+  .qa dt::before{content:"Q";color:var(--accent);font-weight:800}
+  .qa dd::before{content:"A";color:var(--fg-2);font-weight:800}
+
+  /* ---------- 11 구매 유도 — 가격·버튼 없음. 욕구 장면 한 줄로 끝 ---------- */
+  .offer{text-align:center}
+  .offer .label{font-size:var(--fs-sub);color:var(--fg-2)}
+  .offer .bonus{font-size:var(--fs-lead);font-weight:700;color:var(--fg)}
+  .closing{margin:var(--gap) auto 0;padding-top:var(--gap);border-top:1px dashed var(--line);max-width:600px;
+           font-family:var(--font-display);font-weight:var(--display-weight);font-size:var(--fs-h3);line-height:1.4;color:var(--fg)}
+  /* 가격을 요청받았을 때만 되살린다: .offer 안에 div.was.num(정가) + div.now.num(판매가) */
+  .offer .was{text-decoration:line-through;color:var(--fg-2);font-size:var(--fs-body)}
+  .offer .now{font-family:var(--font-display);font-size:var(--fs-big);font-weight:900;color:var(--accent);line-height:1.05;letter-spacing:-.03em}
+
+  /* ---------- 12 고지 ---------- */
+  .notice-list{list-style:none;margin-top:clamp(10px,2.4cqw,18px)}
+  .notice-list li{color:var(--fg-2);padding-left:1em;text-indent:-1em;line-height:1.75;font-size:var(--fs-sub)}
+  .notice-list li::before{content:"· "}
+  .notice b{color:var(--fg)}
+
+  /* =========================================================
+     연출 블록 (2026-11-04 사용자 지시 — 모든 카테고리 기본)
+     "네모 크롭 사진 + 그 위 단조로운 글씨"만으로 페이지를 채우지 않는다.
+     질감 바탕 + 누끼 소품 + 모양 있는 면 + 굵고 큰 글씨로 장면을 "조립"한다.
+     .tex          질감 바탕. 섹션에 class 추가, --tex 에 이미지 (회벽·종이·린넨 등 상품 세계의 재질)
+     .scene        질감 위에 누끼(.prop)를 놓고 큰 글씨(.copy)를 얹은 연출 화면 (첫 화면·해결·마무리)
+                   위치는 인라인 --x --y --w --r. --x·--w = 화면 폭 기준 %, --y = 화면 높이 기준 %, --r = 회전.
+                   첫 화면(s-01)은 주인공 누끼 하나만, 잘리지 않게:
+                     누끼 아래끝 = --y + --w × (누끼 세로÷가로) ÷ (화면 세로÷가로) ≤ 99,  가운데 두려면 --x = (100 − --w) ÷ 2
+                     예) 화면 --ar:1/1.1(세로÷가로 1.1), 정사각 누끼(1.0), --y 45 → --w ≤ (99−45)×1.1 = 59.4 → 58
+                         세로로 긴 파우치 누끼(1.4)면 --w ≤ (99−45)×1.1÷1.4 = 42
+                   해결·마무리 화면에서만 소품 2~4개를 화면 밖으로 살짝 걸치게(이때는 잘려도 된다)
+     .stamp        우표처럼 물결 테두리 흰 카드. 안에 .feat(누끼 + 제목 + 설명) — 장점·정보 묶음
+     .seals        동그란 인장 배지 3개 (판매량·인증·약속) — 네모 카드 3개 대신
+     .ask          공감: 원형 사진 + 말풍선. 어두운 딤(스크림) 금지 — 사진도 밝게 뽑는다
+     .arch .circ .soft   사진 틀: 아치 / 원 / 큰 둥근 모서리. 단독 사진을 맨 네모로 두지 않는다
+     .mark         제품 위 점선 원·알약 + 라벨 (지퍼·성분 표기 짚기)
+     .dots         단계 1-2-3 을 동그라미 가로 줄로
+     .lt / .u      제목 안에 가는 글씨 섞기 / 강조색 밑줄 — 굵기 대비로 리듬을 만든다
+     ========================================================= */
+  .tex{background-color:var(--bg);background-image:var(--tex,none);background-size:min(100%,860px) auto;background-repeat:repeat}
+  .s.tex.alt{background-color:var(--bg-2)}
+  .tex-a{--tex:url(images/tex_a.jpg)}   /* 질감 2종을 섹션마다 번갈아. 생성·이음매 처리는 image-guide.md "질감 바탕" */
+  .tex-b{--tex:url(images/tex_b.jpg)}
+  .lt{font-weight:300}
+  .u{text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:.1em;text-underline-offset:.14em;text-decoration-skip-ink:none}
+  h1 b,h2 b,h3 b{font-weight:inherit;color:var(--accent)}
+
+  .scene{position:relative;overflow:hidden;aspect-ratio:var(--ar,4/5)}
+  .scene .prop{position:absolute;left:var(--x,0);top:var(--y,0);width:var(--w,40%);transform:rotate(var(--r,0deg));
+               background:transparent;border-radius:0;object-fit:contain;filter:drop-shadow(0 1.2cqw 1.8cqw rgba(70,45,20,.22))}
+  .scene .prop.flat{filter:drop-shadow(0 .5cqw .7cqw rgba(70,45,20,.16))}
+  .scene .copy{position:absolute;z-index:2;left:var(--px);right:var(--cr,var(--px));top:var(--cy,8%)}
+  .scene .copy.center{text-align:center}
+  .scene .copy > * + *{margin-top:clamp(8px,2cqw,16px)}
+  .scene h1{font-size:clamp(38px,9.6cqw,84px);line-height:1.14}
+  .scene .copy p{color:var(--fg)}
+  .scene + .cap{padding-top:10px}
+
+  .stamp-wrap{padding:0 var(--px);filter:drop-shadow(0 .8cqw 1.6cqw rgba(70,45,20,.12))}
+  .stamp-wrap + .stamp-wrap{margin-top:clamp(12px,3cqw,24px)}
+  .tx + .stamp-wrap,.stamp-wrap + .tx,.scene + .stamp-wrap{margin-top:var(--gap)}
+  .stamp{--sc:clamp(10px,2.2cqw,18px);background:#fff;padding:calc(var(--sc) * 2) calc(var(--sc) * 2.2);
+    -webkit-mask:radial-gradient(farthest-side,#000 97%,#0000) 0 0/var(--sc) var(--sc) round,linear-gradient(#000 0 0) 50%/calc(100% - var(--sc)) calc(100% - var(--sc)) no-repeat;
+            mask:radial-gradient(farthest-side,#000 97%,#0000) 0 0/var(--sc) var(--sc) round,linear-gradient(#000 0 0) 50%/calc(100% - var(--sc)) calc(100% - var(--sc)) no-repeat}
+  .feat{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(14px,3.4cqw,28px);align-items:center}
+  .feat.rev .fig{order:2}
+  .feat .fig{position:relative}
+  .feat .fig > img{aspect-ratio:1/1;background:transparent;object-fit:contain}
+  .feat h3{font-family:var(--font-display);font-weight:800;font-size:clamp(19px,4.6cqw,40px);line-height:1.3;color:var(--ink,var(--fg))}
+  .feat p{margin-top:clamp(6px,1.6cqw,12px);font-size:var(--fs-sub)}
+
+  .seals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,3cqw,26px);padding:0 var(--px)}
+  .tx + .seals{margin-top:var(--gap)}
+  .seal{aspect-ratio:1/1;border-radius:50%;background:#fff;display:grid;place-content:center;text-align:center;padding:10%;
+        outline:1.5px dashed var(--accent);outline-offset:calc(-1 * clamp(5px,1.4cqw,11px))}
+  .seal b{display:block;font-family:var(--font-display);font-weight:800;font-size:clamp(18px,4.6cqw,40px);color:var(--accent);line-height:1.1;letter-spacing:-.02em}
+  .seal span{display:block;margin-top:4px;font-size:var(--fs-cap);color:var(--fg-2);line-height:1.35}
+
+  .ask{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(14px,3.4cqw,28px);align-items:center;padding:0 var(--px)}
+  .tx + .ask{margin-top:var(--gap)}
+  .ask + .ask{margin-top:clamp(18px,4.4cqw,36px)}
+  .ask.rev{grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr)}
+  .ask.rev .circ{order:2}
+  .circ img{aspect-ratio:1/1;border-radius:50%;object-fit:cover}
+  .circ.ring img{box-shadow:0 0 0 clamp(4px,1cqw,8px) #fff,0 1cqw 2.4cqw rgba(70,45,20,.18)}
+  .bubble{position:relative;background:#fff;border-radius:clamp(16px,4cqw,32px);padding:clamp(16px,4cqw,32px)}
+  .bubble::before{content:"";position:absolute;top:50%;left:calc(-1 * clamp(6px,1.6cqw,13px));width:clamp(14px,3.4cqw,28px);aspect-ratio:1;background:inherit;transform:translateY(-50%) rotate(45deg);border-radius:3px}
+  .ask.rev .bubble::before{left:auto;right:calc(-1 * clamp(6px,1.6cqw,13px))}
+  .bubble b{display:block;font-family:var(--font-display);font-weight:800;font-size:clamp(18px,4.4cqw,38px);line-height:1.3;color:var(--ink,var(--fg))}
+  .bubble p{margin-top:clamp(6px,1.6cqw,12px);font-size:var(--fs-sub)}
+
+  .arch img{border-radius:999px 999px clamp(12px,3cqw,24px) clamp(12px,3cqw,24px)}
+  .soft{padding:0 var(--px)}
+  .soft img{border-radius:clamp(16px,4cqw,36px)}
+
+  .mark{position:absolute;left:var(--x);top:var(--y);width:var(--w,24%);height:var(--h,auto);aspect-ratio:var(--mar,1);border:2px dashed var(--accent);border-radius:999px;z-index:3}
+  .mark span{position:absolute;left:50%;top:100%;transform:translate(-50%,8px);white-space:nowrap;padding:.35em .9em;border-radius:999px;background:var(--accent);color:var(--accent-fg);font-size:var(--fs-cap);font-weight:700;line-height:1.3}
+
+  .dots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap-s);padding:0 var(--px);text-align:center}
+  .tx + .dots{margin-top:var(--gap)}
+  .dots .n{width:clamp(48px,12cqw,100px);height:clamp(48px,12cqw,100px);font-size:clamp(18px,4.6cqw,38px);margin:0 auto clamp(10px,2.4cqw,18px)}
+  .dots h3{font-family:var(--font-body);font-weight:800;font-size:var(--fs-body)}
+  .dots p{margin-top:4px;font-size:var(--fs-sub)}
+
+  /* =========================================================
+     선택 블록 5종 (2026-11-21) — 본문에 <!-- 선택: … --> 주석으로 감싸 둔 블록. 안 쓰면 HTML 만 지우면 된다(CSS 는 남아도 무해)
+     .letter        3번 끝   만든 사람 편지 — 흰 편지지(줄 그은 종이) + 위에 걸친 원형 얼굴 + 서명
+     .lineup.info   5번 끝   옵션 카드 — 위 .lineup 에 정보 줄(한 줄 특징 + 스펙 알약 .chips)을 더한 변형. 2열 기본, .c3 = 3열
+     .posmap        6번      포지셔닝 지도 — 인장(.seal)처럼 점선 두른 흰 판 + 두 축 + 점. 고르는 기준 표 .criteria 와 둘 중 하나
+     .shots         8번      실제 후기 캡처 모음 — 흰 테 사진처럼 살짝 겹쳐 기울인 3:4 × 2~4장 + 동그란 "재구매" 스티커(.re)
+     .optable       11번     옵션 구성표 — 구성 / 용량·수량 / 추가금 (판매가 칸 없음). 고를 수 있는 옵션이 2개 이상일 때만
+     연출형의 결 그대로: 흰 면·둥근 모서리·점선·알약. 강조색은 우리 점·추천 행·재구매 스티커에만
+     ========================================================= */
+  /* .letter — 질감 바탕 위 흰 편지지. 본문 줄 간격(2em)에 맞춰 괘선이 깔린다 → 본문 글자 크기·줄높이를 바꾸면 괘선도 같이 맞는다 */
+  .letter{position:relative;margin:calc(var(--gap) + clamp(38px,9cqw,76px)) var(--px) 0;padding:clamp(54px,12.4cqw,104px) clamp(20px,5.4cqw,46px) clamp(24px,6cqw,48px);
+          background:#fff;border-radius:clamp(16px,4cqw,32px);box-shadow:0 1cqw 2.4cqw rgba(70,45,20,.12)}
+  .letter .face{position:absolute;left:50%;top:0;width:clamp(76px,18cqw,152px);transform:translate(-50%,-50%)}
+  .letter .face img,.letter .face .ph{aspect-ratio:1/1;border-radius:50%;box-shadow:0 0 0 clamp(4px,1cqw,8px) #fff}
+  .letter .face .ph{padding:4px;font-size:12px}
+  .letter h3{text-align:center;font-size:clamp(19px,4.6cqw,40px);line-height:1.35;color:var(--fg)}
+  .letter .body{margin-top:clamp(14px,3.4cqw,28px);font-size:var(--fs-body);
+                background:repeating-linear-gradient(transparent 0 calc(2em - 1px),var(--line) calc(2em - 1px) 2em)}
+  .letter .body p{font-size:1em;line-height:2;color:var(--fg)}
+  .letter .body p + p{margin-top:2em}
+  .letter .sign{margin-top:clamp(16px,4cqw,32px);text-align:right}
+  .letter .sign b{display:block;font-family:var(--font-display);font-weight:800;font-size:var(--fs-body);color:var(--fg)}
+  .letter .sign span{display:block;font-size:var(--fs-cap);color:var(--fg-2)}
+
+  /* .lineup.info — 옵션 카드. 사진은 둥근 틀(.soft 와 같은 결), 이름 아래 한 줄 + 흰 알약 */
+  .lineup.info img,.lineup.info .ph{border-radius:clamp(14px,3.4cqw,28px)}
+  .lineup.info.c3 figcaption b{font-family:var(--font-display);font-weight:800;justify-content:flex-start}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:clamp(8px,2cqw,12px)}
+  .chips i{font-style:normal;padding:.3em .8em;border-radius:999px;background:var(--bg-2);font-size:var(--fs-cap);font-weight:700;color:var(--fg);line-height:1.3;font-variant-numeric:tabular-nums}
+  .s.alt .chips i{background:var(--bg)}   /* .pills 와 같은 규칙 */
+
+  /* .posmap — 점선 두른 흰 판 + 두 축. 양끝 라벨은 알약, 우리 점 이름표는 .mark 와 같은 강조색 알약 */
+  .posmap{margin-top:var(--gap);padding:0 var(--px)}
+  .posmap svg{display:block;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .posmap .field{position:relative;aspect-ratio:1/1;background:#fff;border-radius:clamp(16px,4cqw,32px);
+                 outline:1.5px dashed color-mix(in srgb,var(--accent) 55%,#fff);outline-offset:calc(-1 * clamp(8px,2cqw,16px))}
+  .posmap .axes{position:absolute;inset:0;width:100%;height:100%;stroke:var(--fg-2);stroke-width:1.6}
+  .posmap .axes path{vector-effect:non-scaling-stroke}
+  .posmap .end{position:absolute;padding:.3em .8em;border-radius:999px;background:var(--bg-2);font-size:var(--fs-cap);font-weight:700;color:var(--fg);line-height:1.3;white-space:nowrap}
+  .posmap .end.t{left:calc(50% + clamp(10px,2.4cqw,18px));top:5%}
+  .posmap .end.b{left:calc(50% + clamp(10px,2.4cqw,18px));bottom:5%}
+  .posmap .end.l{left:5%;top:calc(50% + clamp(13px,3.2cqw,24px))}   /* 화살촉 아래로 비켜 둔다 */
+  .posmap .end.r{right:5%;top:calc(50% + clamp(13px,3.2cqw,24px))}
+  .posmap .dot{position:absolute;left:calc(var(--x) * 1%);top:calc((100 - var(--y)) * 1%);width:clamp(11px,2.6cqw,20px);aspect-ratio:1;border-radius:50%;
+               background:color-mix(in srgb,var(--fg-2) 40%,#fff);transform:translate(-50%,-50%);font-style:normal}
+  .posmap .dot span{position:absolute;left:100%;top:50%;transform:translateY(-50%);margin-left:.5em;white-space:nowrap;font-size:var(--fs-cap);color:var(--fg-2);line-height:1.2}
+  .posmap .dot.l span{left:auto;right:100%;margin:0 .5em 0 0}
+  .posmap .dot.ours{z-index:2;width:clamp(20px,4.6cqw,38px);background:var(--accent);box-shadow:0 0 0 clamp(4px,1cqw,8px) #fff,0 .6cqw 1.4cqw rgba(70,45,20,.22)}
+  .posmap .dot.ours span{padding:.35em .9em;margin-left:.9em;border-radius:999px;background:var(--accent);color:var(--accent-fg);font-weight:700;line-height:1.3}
+  .posmap .dot.ours.l span{margin:0 .9em 0 0}
+  .posmap figcaption{padding-top:clamp(10px,2.4cqw,18px);font-size:var(--fs-cap);color:var(--fg-2);text-align:center;line-height:1.5}
+
+  /* .shots — 실제 후기 캡처를 흰 테 사진처럼. 살짝 겹치고 번갈아 기울인다. 재구매 표식은 동그란 스티커 */
+  .shots{display:flex;justify-content:center;margin-top:var(--gap);padding:0 var(--px) clamp(18px,4.4cqw,36px)}
+  .shots svg{display:block;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .shots figure{position:relative;flex:1 1 0;min-width:0;max-width:46%;padding:clamp(5px,1.2cqw,10px);background:#fff;
+                box-shadow:0 1cqw 2.4cqw rgba(70,45,20,.16);transform:rotate(-2.5deg)}
+  .shots figure + figure{margin-left:-4%}
+  .shots figure:nth-child(even){z-index:1;transform:rotate(2deg) translateY(clamp(14px,3.4cqw,28px))}
+  .shots img,.shots .ph{aspect-ratio:3/4;object-fit:cover;object-position:top}
+  /* 스티커는 오른쪽 위 안쪽(옆 사진이 겹치는 가장자리 밖)에 — 겹침에 가려지지 않게 */
+  .shots .re{position:absolute;z-index:2;right:12%;top:calc(-1 * clamp(10px,2.4cqw,20px));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+             width:clamp(48px,10.4cqw,88px);aspect-ratio:1;border-radius:50%;background:var(--accent);color:var(--accent-fg);
+             font-size:var(--fs-cap);font-weight:800;line-height:1.1;transform:rotate(10deg)}
+  .shots .re svg{width:1.1em;height:1.1em;stroke:currentColor;stroke-width:2.4}
+
+  /* .optable — 흰 판 위 점선 줄 표. 추천 행만 강조색이 옅게 깔리고 강조색 알약 꼬리표 */
+  .optable{margin-top:var(--gap);padding:0 var(--px)}
+  .optable h3{text-align:center;font-size:clamp(19px,4.6cqw,40px);line-height:1.35}
+  .optable table{margin-top:clamp(14px,3.4cqw,26px);border-top:0;border-collapse:separate;border-spacing:0}
+  .optable th,.optable td{width:auto;padding:clamp(12px,3cqw,22px) clamp(8px,2cqw,16px);border-bottom:1px dashed var(--line);text-align:center;vertical-align:middle;line-height:1.4;color:var(--fg);font-weight:400}
+  .optable thead th{font-size:var(--fs-sub);color:var(--fg-2);border-bottom:1.5px solid var(--fg)}
+  .optable thead th:first-child,.optable tbody th{text-align:left}
+  .optable tbody th{width:46%;font-weight:800}
+  .optable td:last-child,.optable thead th:last-child{text-align:right}
+  .optable td:last-child{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .optable .pick th,.optable .pick td{background:color-mix(in srgb,var(--accent) 9%,var(--bg));border-bottom-color:transparent}
+  .optable .pick th{border-radius:var(--radius-card) 0 0 var(--radius-card)}
+  .optable .pick td:last-child{border-radius:0 var(--radius-card) var(--radius-card) 0}
+  .optable em{display:block;width:fit-content;margin-top:6px;padding:.25em .7em;border-radius:999px;background:var(--accent);color:var(--accent-fg);font-style:normal;font-size:var(--fs-cap);font-weight:700;line-height:1.3}
+
+  /* =========================================================
+     공통 유틸 (네 템플릿 같은 이름, 2026-11-21)
+     장수 변형  .c2 .c3 .c4 — 장수가 고정인 블록(.seals .dots .badges .icons .lineup .check.row)을 2~4칸으로. 기본은 3칸(.lineup은 2칸)
+                .mosaic.c2 — 콜라주를 2장(같은 크기 2열)으로
+     .contain   누끼를 cover 자리(.pair .lineup .wide .hero .split .pic 등)에 넣을 때 — 잘리지 않게 contain + 옅은 바탕
+     .pos-top .pos-bottom .pos-left .pos-right — cover 크롭 위치 (img 또는 감싼 블록에)
+     ========================================================= */
+  .seals.c2,.dots.c2,.badges.c2,.check.row.c2,.lineup.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .seals.c3,.dots.c3,.badges.c3,.check.row.c3,.icons.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .seals.c4,.dots.c4,.badges.c4,.lineup.c4{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .seals.c2,.dots.c2{max-width:calc(var(--w) * .72);margin-inline:auto}
+  .mosaic.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mosaic.c2 .tall{grid-row:auto}
+  .mosaic.c2 .tall img,.mosaic.c2 .tall .ph{height:auto;aspect-ratio:1/1}
+  img.contain,.contain img{object-fit:contain;background:var(--bg-2)}
+  img.pos-top,.pos-top img{object-position:top}
+  img.pos-bottom,.pos-bottom img{object-position:bottom}
+  img.pos-left,.pos-left img{object-position:left}
+  img.pos-right,.pos-right img{object-position:right}
+
+  @media (max-width:480px){
+    .seals.c4,.dots.c4,.badges.c4,.lineup.c4{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .fitcheck{grid-template-columns:minmax(0,1fr)}
+    .posmap .end{padding:.25em .6em}
+    .shots figure + figure{margin-left:-6%}
+    .shots .re{right:20%}
+  }
+
+  /* =========================================================
+     모션 — 딱 2곳. 더 넣지 않는다 (가독성 > 화려함)
+     ① 첫 화면 등장: 페이지 열 때 한 번
+     ② 핵심 숫자 카운트업: 6번 .big 이 화면에 들어올 때 한 번 (아래 script 태그)
+     쿠팡·스마트스토어는 이미지로 올리므로 모션이 사라진다. 자사몰(HTML)·미리보기에서만 보인다.
+     ========================================================= */
+  @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  .s-01 h1{animation:rise .7s cubic-bezier(.16,1,.3,1) both}
+  .s-01 .lead{animation:rise .7s .12s cubic-bezier(.16,1,.3,1) both}
+  .s-01 .hero,.s-01 .wide,.s-01 .imgtext{animation:rise .9s .2s cubic-bezier(.16,1,.3,1) both}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  .s-01 .scene .prop{animation:fadein .9s .2s cubic-bezier(.16,1,.3,1) both}   /* 소품은 회전값을 지키려고 투명도만 */
+
+  @media (max-width:480px){
+    .badges{gap:6px} .badge{padding:14px 4px}
+    .icons.c4{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .check.row{grid-template-columns:1fr}
+    .check.row li{flex-direction:row;text-align:left;align-items:flex-start}
+    .step.pic{grid-template-columns:auto 1fr}
+    .step.pic img,.step.pic .ph{grid-column:2;max-width:60%}
+  }
+</style>
+</head>
+<body>
+<div class="page" data-theme="clean" data-font="clean" data-preset="">
+<!-- PAGE-BODY:START -->
+
+<!-- 1. 첫 화면 (후킹) — 절대 빼지 않음. 기본은 질감 바탕 + 주인공 누끼 하나(.scene) + 굵은 제목(위 글 → 아래 상품).
+     사진 한 장이 꼭 필요한 카테고리(패션 착용·인테리어 공간·음식 담음새)는 .scene 대신 사진 블록에 .soft/.arch 틀:
+     식품 .wide.w32 / 뷰티·건강·스포츠 .hero / 패션 .hero.r56 / 가전·인테리어 .wide / 완구·반려 .hero.sq / 도서 .hero.book
+     높이: 3번 섹션이 업로드 이미지 앞 3,000px(860폭) 안에서 시작해야 한다 — 화면을 --ar:1/1.1 보다 길게 늘이지 않는다 -->
+<section class="s s-01 tex tex-a">
+  <!-- 주인공 하나만. 위치·크기 공식은 CSS 연출 블록 주석(.scene): 아래끝 = --y + --w × (누끼 세로÷가로) ÷ 1.1 ≤ 99, --x = (100 − --w) ÷ 2.
+       기본값은 정사각에 가까운 누끼(세로÷가로 1.0) 기준 --y 45 · --w 58 → 45 + 58÷1.1 = 97.7. 누끼가 세로로 길면 --w 를 줄인다.
+       글이 길어 상품과 겹치면 --y 를 내리고 공식대로 --w 를 다시 계산한다. 곁다리 소품은 여기 두지 않는다(4번·7번·11번에서). -->
+  <div class="brandbar"><b>{{브랜드명}}</b><span>{{상품 한 줄}}</span></div>
+  <div class="scene" style="--ar:1/1.1">
+    <img class="prop" src="images/cut/{{주인공 누끼}}.png" alt="{{상품명}}" style="--x:21%;--y:45%;--w:58%">
+    <div class="copy center" style="--cy:6%">
+      <p class="lead">{{가는 글씨 한 줄 — 카테고리·산지 등}}</p>
+      <h1><span class="u">{{브랜드}}</span><br>{{상품명 굵게}}</h1>
+      <p>{{헤드카피 한 줄}}</p>
+    </div>
+  </div>
+  <p class="cap ai">연출 이미지(AI 활용)</p>
+  <div class="kw"><span>{{키워드 1}}</span><span>{{키워드 2}}</span><span>{{키워드 3}}</span></div>
+</section>
+
+<!-- 2. 믿을 근거 — 진짜 숫자만. 색·옵션 고르기가 구매의 핵심인 상품(문구·인테리어·식품 세트)만 .badges 대신 .lineup(옵션 나열)을 2번에. 그 밖엔 옵션 나열은 9번 -->
+<section class="s s-02 tex tex-b">
+  <div class="tx center">
+    <h2><span class="lt">{{가는 앞부분}}</span><br>{{굵은 뒷부분 — "○○만 분이 먼저 선택했어요"}}</h2>
+  </div>
+  <!-- 네모 카드 3개 대신 인장 배지 3개 -->
+  <div class="seals">
+    <div class="seal"><b class="num">{{숫자}}</b><span>{{설명}}</span></div>
+    <div class="seal"><b class="num">{{숫자}}</b><span>{{설명}}</span></div>
+    <div class="seal"><b>{{인증/약속}}</b><span>{{설명}}</span></div>
+  </div>
+  <p class="fn">* {{숫자의 출처 — 기간·기관. 1위·누적 주장엔 반드시}}</p>
+  <!-- 진짜 숫자가 없는 신규 브랜드: 숫자 대신 약속·사실(원재료 수·산지·제조 방식)을 인장에 쓴다. 인장이 2개뿐이면 class="seals c2" -->
+</section>
+
+<!-- 3. 공감 (손님의 고민 장면) — 절대 빼지 않음. 원형 사진(.circ 1:1, 밝게) + 말풍선(.bubble)에 고민 문구. 장면 2개가 기본, 1개면 .ask 하나만.
+     어두운 스크림 위 글(.imgtext)은 이 템플릿에선 쓰지 않는다(2026-11-04) -->
+<section class="s s-03 tex tex-a">
+  <div class="tx center">
+    <h2><span class="lt">{{가는 앞부분}}</span><br>{{고민을 질문으로}}</h2>
+  </div>
+  <div class="ask">
+    <div class="circ ring"><img src="images/03_ask_1.png" alt="{{장면 설명}}" onerror="this.outerHTML='<div class=\'ph\'>03_ask_1.png (1:1 밝게)</div>'"></div>
+    <div class="bubble"><b>{{고민 장면 1 — 시간·장소가 박힌 한 줄}}</b><p>{{구체적인 순간 한 줄}}</p></div>
+  </div>
+  <div class="ask rev">
+    <div class="circ ring"><img src="images/03_ask_2.png" alt="{{장면 설명}}" onerror="this.outerHTML='<div class=\'ph\'>03_ask_2.png (1:1 밝게)</div>'"></div>
+    <div class="bubble"><b>{{고민 장면 2}}</b><p>{{한 줄}}</p></div>
+  </div>
+  <p class="cap ai">연출 이미지(AI 활용)</p>
+  <div class="tx center" style="margin-top:var(--gap)"><p class="lead fg">{{고민을 받아주는 한 줄 — 해결로 넘어가는 다리}}</p></div>
+  <!-- 선택: 쓰지 않으면 통째로 삭제 — 만든 사람 편지(.letter). 소상공인·1인 제작자용(마마솝 대표 편지·도라지부부 결, layout-refs.md 4항).
+       작은 원형 얼굴 1:1(images/02_face.png) + 편지 6~10줄(문단 2~3개) + 서명(이름 · 직함 · 업력).
+       기본 위치는 여기(3번 끝 = 4번 해결 앞). 2번 신뢰 바로 뒤로 올리면 3번이 앞 3,000px 밖으로 밀리기 쉽다 — 올렸으면 export 보고서로 3번 시작을 확인.
+       편지는 사장님이 한 말로만 쓴다 — 지어낸 사연·업력 금지. 얼굴은 실제 사진만(AI로 만든 사람 얼굴 금지). 얼굴이 싫다면 손·작업대 사진으로 바꾸고 원형 틀은 그대로. -->
+  <div class="letter">
+    <figure class="face"><img src="images/02_face.png" alt="{{만든 사람 이름}}" onerror="this.outerHTML='<div class=\'ph\'>02_face (1:1)</div>'"></figure>
+    <h3>{{편지 첫 줄 — 예: 아이 간식 때문에 처음 만들었어요}}</h3>
+    <div class="body">
+      <p>{{1문단 — 왜 시작했는지 2~3줄}}</p>
+      <p>{{2문단 — 무엇을 지키며 만드는지 2~3줄}}</p>
+      <p>{{3문단 — 손님께 하는 약속 2줄}}</p>
+    </div>
+    <p class="sign"><b>{{이름}}</b><span>{{직함 · 업력 — 예: 대표 · 9년째 같은 부엌에서 만듭니다}}</span></p>
+  </div>
+  <!-- /선택 끝: .letter -->
+</section>
+
+<!-- 4. 해결 선언 — 3번과 톤 대비. 사진(3:4)+글 2열 .split 이 기본. 사진을 오른쪽에 두려면 .split.rev.
+     누끼만 있으면 class="pic contain", 소품 연출을 하고 싶으면 .split 대신 .scene(소품 2~4개) -->
+<section class="s s-04 alt">
+  <div class="split">
+    <div class="pic"><img src="images/04_solution.png" alt="{{상품명}}" onerror="this.outerHTML='<div class=\'ph\'>04_solution.png (3:4)</div>'"></div>
+    <div class="tx">
+      <h2>{{해결 선언 한 문장}}</h2>
+      <p>{{왜 그렇게 만들었는지 두 줄}}</p>
+    </div>
+  </div>
+  <p class="cap ai">연출 이미지(AI 활용)</p>
+</section>
+
+<!-- 5. 핵심 장점 3가지 — 절대 빼지 않음. 기본은 우표 카드(.stamp.feat) ×3, 좌우 교차(.rev). 끝에 .icons 로 호환·재질 요약(불필요하면 삭제).
+     사진으로 보여 줘야 하는 장점(가전 기능·음식 담음새·패션 디테일)은 .stamp 대신 사진 블록으로 바꿔도 된다:
+     가전 .split / .split.rev 교차 · 식품 .wide.w32 · 패션 .pair 디테일. 장점이 2개뿐이면 .stamp-wrap 을 2개만 -->
+<section class="s s-05 tex tex-a">
+  <div class="tx center">
+    <h2><span class="lt">{{가는 앞부분}}</span><br>{{굵은 뒷부분 — "좋은 이유"}}</h2>
+  </div>
+  <!-- 우표 카드(.stamp) 안에 누끼(.fig) + 제목 + 설명. 좌우 교차(.rev). 사진이 꼭 필요하면 .fig.arch 로 아치 틀.
+       제품 부위를 짚을 땐 .fig 안에 i.mark(style 로 --x --y --w) + 그 안에 span 라벨 -->
+  <div class="stamp-wrap"><div class="stamp feat">
+    <div class="fig"><img src="images/cut/{{장점1 누끼}}.png" alt="{{설명}}"></div>
+    <div><h3>{{장점 1 — 손님 이득으로}}</h3><p>{{설명 2줄}}</p></div>
+  </div></div>
+  <div class="stamp-wrap"><div class="stamp feat rev">
+    <div class="fig"><img src="images/cut/{{장점2 누끼}}.png" alt="{{설명}}"></div>
+    <div><h3>{{장점 2}}</h3><p>{{설명 2줄}}</p></div>
+  </div></div>
+  <div class="stamp-wrap"><div class="stamp feat">
+    <div class="fig arch"><img src="images/{{장점3 사진}}.png" alt="{{설명}}" style="aspect-ratio:3/4;object-fit:cover"></div>
+    <div><h3>{{장점 3}}</h3><p>{{설명 2줄}}</p></div>
+  </div></div>
+  <p class="cap ai">연출 이미지(AI 활용)</p>
+  <div class="tx" style="margin-top:var(--py)"><h3 class="center">{{아이콘 줄 제목 — "이렇게 쓸 수 있어요" (불필요하면 .icons 통째로 삭제)}}</h3></div>
+  <div class="icons">
+    <div><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h6M7 13h4"/></svg><b>{{특징 1}}</b><span>{{보조}}</span></div>
+    <div><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><b>{{특징 2}}</b><span>{{보조}}</span></div>
+    <div><svg viewBox="0 0 24 24"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"/><path d="M9 12l2 2 4-4"/></svg><b>{{특징 3}}</b><span>{{보조}}</span></div>
+  </div>
+  <!-- 선택: 쓰지 않으면 통째로 삭제 — 옵션 카드(.lineup.info = .lineup 에 정보 줄을 더한 변형). 색상·맛·구성 옵션을 카드로:
+       옵션마다 설명할 차이가 있을 때만(2개↑). 색만 다르면 이 카드 대신 9번 .lineup(사진 + 이름).
+       1:1 사진 + 옵션명 + 한 줄 특징 + 스펙 알약(.chips) 1~2개. 옵션 2·4개 = 2열(기본), 3·6개 = class="lineup info c3".
+       누끼 사진이면 class="lineup info contain".
+       사진만 나열할 땐(구성품·선물컷) 그냥 .lineup. 옵션이 상품의 전부(향·맛이 다인 소품)면 이 블록을 .stamp 앞으로 올려 장점 본문으로 쓴다(fxng 디퓨저 결).
+       사진은 옵션끼리 같은 배경·같은 각도. 가격·할인은 넣지 않는다(추가금은 11번 .optable). 알약은 사실만(용량·맵기 단계·사이즈). -->
+  <div class="tx" style="margin-top:var(--py)"><h3 class="center">{{옵션 제목 — 예: 맛은 네 가지예요}}</h3></div>
+  <div class="lineup info">
+    <figure><img src="images/05_opt_1.png" alt="{{옵션 1}}" onerror="this.outerHTML='<div class=\'ph\'>05_opt_1 (1:1)</div>'">
+      <figcaption><b>{{옵션 이름 1}}</b><span>{{한 줄 특징}}</span><p class="chips"><i>{{스펙 1}}</i><i>{{스펙 2}}</i></p></figcaption></figure>
+    <figure><img src="images/05_opt_2.png" alt="{{옵션 2}}" onerror="this.outerHTML='<div class=\'ph\'>05_opt_2 (1:1)</div>'">
+      <figcaption><b>{{옵션 이름 2}}</b><span>{{한 줄 특징}}</span><p class="chips"><i>{{스펙 1}}</i><i>{{스펙 2}}</i></p></figcaption></figure>
+    <figure><img src="images/05_opt_3.png" alt="{{옵션 3}}" onerror="this.outerHTML='<div class=\'ph\'>05_opt_3 (1:1)</div>'">
+      <figcaption><b>{{옵션 이름 3}}</b><span>{{한 줄 특징}}</span><p class="chips"><i>{{스펙 1}}</i></p></figcaption></figure>
+    <figure><img src="images/05_opt_4.png" alt="{{옵션 4}}" onerror="this.outerHTML='<div class=\'ph\'>05_opt_4 (1:1)</div>'">
+      <figcaption><b>{{옵션 이름 4}}</b><span>{{한 줄 특징}}</span><p class="chips"><i>{{스펙 1}}</i></p></figcaption></figure>
+  </div>
+  <p class="cap">실물 촬영</p>  <!-- AI 사진이면 class="cap ai" + "연출 이미지(AI 활용)" -->
+  <!-- /선택 끝: .lineup.info -->
+</section>
+
+<!-- 6. 증거 — 큰 숫자 + 고르는 기준 표(.criteria). 시험성적서 이미지가 있으면 .pair.contain 으로 2장.
+     큰 숫자(.big)는 2번에 없던 새 근거(시험 수치·공정 시간 등)가 있을 때만 — 없으면 .big 과 그 설명 줄을 지우고 표 + 솔직한 한 줄만.
+     시험성적·수치 근거가 없으면 .criteria를 쓴다. "일반 제품" 비교 열은 근거(시험·공개 자료)가 있을 때만 -->
+<section class="s s-06 alt">
+  <div class="tx center">
+    <h2>{{증거 제목 — 예: 말랭이 고를 때 이것만 보세요}}</h2>
+    <hr class="divider">
+    <!-- data-count="숫자" data-suffix="단위" : 예) data-count="425" data-suffix="배" / data-count="12480" data-suffix="개" -->
+    <div class="big num" data-count="{{숫자}}" data-suffix="{{단위}}">{{핵심 숫자}}</div>
+    <p>{{숫자의 의미}}</p>
+    <!-- .criteria — 손님이 기준을 들고 스스로 비교하게. 3~5행. "확인할 것" = 손님이 포장·성분표·상세에서 직접 볼 곳 -->
+    <table class="criteria">
+      <thead><tr><th>고르는 기준</th><th>확인할 것</th><th>이 상품은</th></tr></thead>
+      <tbody>
+        <tr><th>{{기준 1 — 예: 원재료}}</th><td>{{확인할 것 — 예: 성분표 원재료 개수}}</td><td class="ours">{{이 상품 — 예: 감귤 1가지}}</td></tr>
+        <tr><th>{{기준 2}}</th><td>{{확인할 것}}</td><td class="ours">{{이 상품}}</td></tr>
+        <tr><th>{{기준 3}}</th><td>{{확인할 것}}</td><td class="ours">{{이 상품}}</td></tr>
+      </tbody>
+    </table>
+    <p class="fg" style="margin-top:var(--gap)">{{솔직한 약점 한 줄 — 예: 설탕 입힌 말랭이보다는 덜 달아요. 대신 귤 맛이 그대로예요}}</p>
+    <!-- 선택: 근거(시험·공개 자료)가 있을 때만 — 비교표(table.cmp). .criteria 대신 쓴다. "일반 제품" 칸은 출처 있는 수치·사실로만 채우고 각주(.fn)에 출처.
+         구조: thead 한 줄(빈칸 / 일반 제품 / 상품명) + tbody 3~5줄(th 항목 / td 일반 / td.ours 우리). 꺼내 쓰려면 이 주석을 풀어 table 로 되살린다.
+    table.cmp
+      thead: (빈칸) | 일반 제품 | {{상품명}}
+      tbody: {{항목 1}} | {{X 또는 수치}} | ours {{O 또는 수치}}
+             {{항목 2}} | … | ours …
+             {{항목 3}} | … | ours …
+    /선택 끝: .cmp -->
+  </div>
+  <!-- 선택: 쓰지 않으면 통째로 삭제 — 포지셔닝 지도(.posmap). 위 기준 표(.criteria·.cmp)와 둘 중 하나만 쓴다(컬리 "양념 취향 지도" 결).
+       정사각 판에 두 축 — 양끝 라벨 4개(.end.t 위 / .b 아래 / .l 왼쪽 / .r 오른쪽) + 점 5~8개.
+       점 위치는 style="--x:0~100;--y:0~100" (x 0 = 왼쪽 끝, 100 = 오른쪽 끝 / y 0 = 아래 끝, 100 = 위 끝). 10~90 안에서 쓴다(판 안쪽 점선 때문).
+       일반 예시 점(.dot)은 이름 없는 회색 점. 이름을 붙이려면 "일반 ○○" 같은 일반명만(점 안 span). 우리 상품(.dot.ours) 하나만 강조색 + 상품명.
+       이름표가 판 밖으로 나가면(점이 오른쪽, --x 65 이상) class 에 l 을 더해 이름을 왼쪽으로.
+       남의 상품명을 쓰지 않는다(비방 소지). 축과 점 위치는 판매자가 아는 사실(맛 지표·성분 수치·직접 비교)로만.
+       근거가 없으면 이 블록은 지우고 위 '고르는 기준' 표(.criteria)만 쓴다. -->
+  <figure class="posmap">
+    <div class="field">
+      <svg class="axes" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M6 50h88M50 6v88"/><path d="M9 47.5 6 50l3 2.5M91 47.5l3 2.5-3 2.5M47.5 9 50 6l2.5 3M47.5 91l2.5 3 2.5-3"/></svg>
+      <span class="end t">{{위 끝 — 예: 단맛 강함}}</span>
+      <span class="end b">{{아래 끝 — 예: 단맛 약함}}</span>
+      <span class="end l">{{왼쪽 끝 — 예: 순한맛}}</span>
+      <span class="end r">{{오른쪽 끝 — 예: 매운맛}}</span>
+      <i class="dot" style="--x:20;--y:66"></i>
+      <i class="dot" style="--x:32;--y:34"></i>
+      <i class="dot" style="--x:40;--y:80"></i>
+      <i class="dot" style="--x:58;--y:26"><span>{{일반명 — 예: 일반 국물떡볶이 (이름 없이 점만이면 span 삭제)}}</span></i>
+      <i class="dot" style="--x:66;--y:62"></i>
+      <i class="dot" style="--x:24;--y:18"></i>
+      <i class="dot ours l" style="--x:80;--y:76"><span>{{상품명 짧게}}</span></i>
+    </div>
+    <figcaption>{{지도 읽는 법 한 줄 — 예: 점 하나가 시중 떡볶이 한 종류예요. 자사 블라인드 시식 기준}}</figcaption>
+  </figure>
+  <!-- /선택 끝: .posmap -->
+  <p class="fn">* {{시험기관 · 조건 · n수 · 기간}}</p>
+</section>
+
+<!-- 7. 사용 장면 — 와이드 1장(.wide 4:3) → 글+사진(.split.rev 3:4) → (순서가 있으면) 단계(.steps 1-2-3, 2단계면 2개만).
+     선물·보관 컷이 더 있으면 .pair(1:1×2)를 끝에 더한다. 소품 연출을 하고 싶으면 .wide 대신 .scene(소품 2~4개) -->
+<section class="s s-07">
+  <div class="tx">
+    <h2>{{사용 장면 제목}}</h2>
+  </div>
+  <figure>
+    <div class="wide"><img src="images/07_use_1.png" alt="" onerror="this.outerHTML='<div class=\'ph\'>07_use_1.png (4:3)</div>'"></div>
+    <p class="cap ai">연출 이미지(AI 활용)</p>
+    <figcaption class="tx"><h3>{{상황 1}}</h3><p>{{설명 한 줄}}</p></figcaption>
+  </figure>
+  <figure class="split rev" style="margin-top:var(--py)">
+    <div class="pic"><img src="images/07_use_2.png" alt="" onerror="this.outerHTML='<div class=\'ph\'>07_use_2.png (3:4)</div>'"></div>
+    <figcaption class="tx"><h3>{{상황 2}}</h3><p>{{설명 두 줄}}</p></figcaption>
+  </figure>
+  <p class="cap ai">연출 이미지(AI 활용)</p>
+  <div class="tx" style="margin-top:var(--py)"><h3>{{단계 제목 — "조리는 이렇게" / "설치 3단계" (없으면 .steps 삭제)}}</h3></div>
+  <div class="steps">
+    <div class="step"><span class="n">1</span><div><h3>{{1단계}}</h3><p>{{설명}}</p></div></div>
+    <div class="step"><span class="n">2</span><div><h3>{{2단계}}</h3><p>{{설명}}</p></div></div>
+    <div class="step"><span class="n">3</span><div><h3>{{3단계}}</h3><p>{{설명}}</p></div></div>
+  </div>
+</section>
+
+<!-- 8. 후기 — 실제 후기만(지어내기 금지). 후기가 아직 없으면 아래 .fitcheck 로 바꾼다 -->
+<section class="s s-08 alt">
+  <div class="tx"><h2>먼저 써보신 분들</h2></div>
+  <div class="reviews" style="margin-top:var(--gap)">
+    <div class="review">
+      <div class="stars" aria-label="별점 5점">
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+      </div>
+      <p>“{{후기 핵심 문장}}”</p>
+      <div class="who">{{옵션 · 날짜 · 닉네임}}</div>
+      <div class="reply">{{판매자 답글 (선택 — 없으면 이 줄 삭제)}}</div>
+    </div>
+    <div class="review">
+      <div class="stars" aria-label="별점 5점">
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+      </div>
+      <p>“{{후기 핵심 문장}}”</p>
+      <div class="who">{{옵션 · 날짜 · 닉네임}}</div>
+    </div>
+  </div>
+  <!-- 선택: 쓰지 않으면 통째로 삭제 — 실제 후기 캡처 모음(.shots). 스마트스토어 소상공인 결(코코하니·엔치약·포제나, layout-refs.md 4항).
+       캡처 2~4장, 세로 3:4(images/08_shot_1.png…). 흰 테 사진처럼 살짝 겹쳐 번갈아 기울인다. 4장이면 폰에서 좁아지니 3장까지 권장.
+       실제 후기 캡처만 — 문장 고치기·합성·짜깁기 금지. 개인정보(아이디·얼굴·주소·주문번호)는 가린다.
+       .re 스티커는 진짜 재구매 후기에만("재구매"), 아니면 .re 삭제. 대가 제공 후기(체험단·무상 제공)는 .re 자리에 "무상 제공"이라고 쓰고 각주에도 밝힌다.
+       출처 각주(.fn)는 몰 이름·기준 날짜까지 반드시. 캡처가 3장 이상이면 위 .reviews 카드는 1개로 줄인다. -->
+  <div class="shots">
+    <figure><img src="images/08_shot_1.png" alt="{{실제 후기 캡처 1 — 무슨 내용인지}}" onerror="this.outerHTML='<div class=\'ph\'>08_shot_1 (3:4 실제 후기 캡처)</div>'">
+      <b class="re"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 11a7.5 7.5 0 0 1 13-4.6L19.5 8.5"/><path d="M19.5 4v4.5H15"/><path d="M19.5 13a7.5 7.5 0 0 1-13 4.6L4.5 15.5"/><path d="M4.5 20v-4.5H9"/></svg>재구매</b></figure>
+    <figure><img src="images/08_shot_2.png" alt="{{실제 후기 캡처 2}}" onerror="this.outerHTML='<div class=\'ph\'>08_shot_2 (3:4 실제 후기 캡처)</div>'"></figure>
+    <figure><img src="images/08_shot_3.png" alt="{{실제 후기 캡처 3}}" onerror="this.outerHTML='<div class=\'ph\'>08_shot_3 (3:4 실제 후기 캡처)</div>'">
+      <b class="re"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 11a7.5 7.5 0 0 1 13-4.6L19.5 8.5"/><path d="M19.5 4v4.5H15"/><path d="M19.5 13a7.5 7.5 0 0 1-13 4.6L4.5 15.5"/><path d="M4.5 20v-4.5H9"/></svg>재구매</b></figure>
+  </div>
+  <p class="fn">* {{네이버 스마트스토어}} 실제 구매 후기 캡처, {{2026.○○}} 기준</p>
+  <!-- /선택 끝: .shots -->
+  <!-- 후기가 아직 없으면: 위 후기 블록을 지우고 이 .fitcheck만 남긴다. 사은품이 실제로 있을 때만 "첫 후기 이벤트" 한 줄 추가.
+       후기 블록이 있으면 .fitcheck는 지운다. .fitcheck를 쓰면 섹션 제목을 "나한테 맞을지 먼저 보세요"처럼 판단을 돕는 말로 바꾸고(안쪽 h3 "이런 분께 맞아요"와 겹치지 않게), 10번의 "이런 분께 추천해요" 목록은 지운다(FAQ만 남김).
+       "안 맞아요"는 진짜 한계(맛·크기·용도)로 — 솔직한 쪽이 나머지를 믿게 한다. -->
+  <div class="fitcheck">
+    <div class="yes"><h3>이런 분께 맞아요</h3>
+      <ul><li>{{맞는 분 1}}</li><li>{{맞는 분 2}}</li><li>{{맞는 분 3}}</li></ul></div>
+    <div class="no"><h3>이런 분껜 안 맞아요</h3>
+      <ul><li>{{안 맞는 분 1}}</li><li>{{안 맞는 분 2}}</li><li>{{안 맞는 분 3}}</li></ul></div>
+  </div>
+  <!-- /선택 끝: .fitcheck -->
+</section>
+
+<!-- 9. 실물 디테일 + 상세 정보 — 본문이 AI 연출컷이므로 실물 사진 콜라주(.mosaic 세로 1 + 정사각 2)는 기본. 2장이면 class="mosaic c2".
+     패키지·치수는 .pair.contain. 실물 사진이 정말 없으면 기준컷·누끼로 채우고 캡션을 "연출 이미지(AI 활용)"로 -->
+<section class="s s-09">
+  <div class="tx"><h2>{{실물 제목 — "받아보시는 그대로예요"}}</h2></div>
+  <div class="mosaic" style="margin-top:var(--gap)">
+    <div class="tall"><img src="images/09_real_1.png" alt="{{상품명}} 실물 정면" onerror="this.outerHTML='<div class=\'ph\'>09_real_1.png (세로)</div>'"></div>
+    <div><img src="images/09_real_2.png" alt="{{상품명}} 실물 측면" onerror="this.outerHTML='<div class=\'ph\'>09_real_2.png (1:1)</div>'"></div>
+    <div><img src="images/09_real_3.png" alt="{{상품명}} 실물 뒷면" onerror="this.outerHTML='<div class=\'ph\'>09_real_3.png (1:1)</div>'"></div>
+  </div>
+  <p class="cap">실물 촬영</p>  <!-- AI 사진이면 class="cap ai" + "연출 이미지(AI 활용)" -->
+  <div class="tx" style="margin-top:var(--py)"><h3>{{구성·크기 제목 — "이렇게 보내드려요"}}</h3></div>
+  <div class="pair contain" style="margin-top:var(--gap)">
+    <img src="images/09_box_1.png" alt="{{상품명}} 패키지" onerror="this.outerHTML='<div class=\'ph\'>09_box_1.png (누끼 1:1)</div>'">
+    <img src="images/09_box_2.png" alt="{{상품명}} 크기 비교" onerror="this.outerHTML='<div class=\'ph\'>09_box_2.png (치수 표시)</div>'">
+  </div>
+  <p class="cap">실물 촬영</p>  <!-- AI 사진이면 class="cap ai" + "연출 이미지(AI 활용)" -->
+  <dl class="summary">
+    <dt>{{항목 — 구성}}</dt><dd>{{내용}}</dd>
+    <dt>{{항목 — 크기/용량}}</dt><dd>{{내용}}</dd>
+    <dt>{{항목 — 재질/원산지}}</dt><dd>{{내용}}</dd>
+    <dt>{{항목 — 배송}}</dt><dd>{{내용}}</dd>
+  </dl>
+</section>
+
+<!-- 10. 이런 분께 추천 + FAQ. 8번을 .fitcheck 로 바꿨으면 "이런 분께 추천해요" 목록은 지우고 FAQ만 -->
+<section class="s s-10 alt">
+  <div class="tx">
+    <h2>이런 분께 추천해요</h2>
+    <ul class="check">
+      <li><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg><span>{{추천 대상 1}}</span></li>
+      <li><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg><span>{{추천 대상 2}}</span></li>
+      <li><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg><span>{{추천 대상 3}}</span></li>
+    </ul>
+    <h3 style="margin-top:var(--py)">자주 묻는 질문</h3>
+    <dl class="qa">
+      <div><dt>{{질문 1}}</dt><dd>{{답변 — 접지 말고 펼친 상태로}}</dd></div>
+      <div><dt>{{질문 2}}</dt><dd>{{답변}}</dd></div>
+      <div><dt>{{질문 3}}</dt><dd>{{답변}}</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- 11. 혜택 + 구매 유도 — 절대 빼지 않음. 구성품 펼친 샷은 .wide(4:3 플랫레이). 누끼 한 장뿐이면 class="wide contain".
+     가격 금지 (모든 카테고리). 사용자가 요청할 때만 .offer 안에 .was/.now 를 되살린다. CTA 버튼 금지 -->
+<section class="s s-11">
+  <div class="wide"><img src="images/11_offer.png" alt="{{상품명}} 구성" onerror="this.outerHTML='<div class=\'ph\'>11_offer.png (4:3 플랫레이)</div>'"></div>
+  <p class="cap ai">연출 이미지(AI 활용)</p>  <!-- 실물 사진이면 class="cap" + "실물 촬영" -->
+  <!-- 선택: 쓰지 않으면 통째로 삭제 — 옵션 구성표(.optable). 스마트스토어·자사몰 + 사용자가 넣겠다고 할 때만.
+       고를 수 있는 옵션이 2개 이상일 때(수량 1봉/3봉/6봉, 색상, 세트 종류). 한 세트 안 구성품 개수는 상관없다 — 구성품은 9번 .summary·11번 플랫레이가 맡는다.
+       쿠팡은 금지(상세에 가격·할인 문구 금지). 가격이 바뀌면 이미지를 다시 올려야 함.
+       열은 구성 / 용량·수량 / 추가금 셋. 판매가(총액) 칸은 없다 — 추가금만. 첫 행 = 기본 구성(추가금 "–").
+       제일 많이 나가는 구성 한 줄에만 class="pick" + "제일 많이 가져가시는 구성"(실제 판매 1위일 때만, 아니면 pick·em 삭제). 강조색은 그 행에만. -->
+  <div class="optable">
+    <h3>{{구성표 제목 — 예: 필요한 만큼 골라 담으세요}}</h3>
+    <table>
+      <thead><tr><th>구성</th><th>용량·수량</th><th>추가금</th></tr></thead>
+      <tbody>
+        <tr><th>{{기본 구성 — 예: 1봉}}</th><td>{{용량·수량}}</td><td>–</td></tr>
+        <tr class="pick"><th>{{추천 구성}}<em>제일 많이 가져가시는 구성</em></th><td>{{용량·수량}}</td><td>{{+○,○○○원}}</td></tr>
+        <tr><th>{{구성 3}}</th><td>{{용량·수량}}</td><td>{{+○,○○○원}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="fn">* 추가금은 기본 구성 기준이에요. 정확한 금액은 상품 옵션에서 확인해주세요.</p>
+  <!-- /선택 끝: .optable -->
+  <div class="tx offer" style="margin-top:var(--gap)">
+    <p class="label">{{구성 · 사은품 · 조건}}</p>
+    <p class="bonus">{{혜택 한 줄 — "2세트 주문 시 1개 더"}}</p>
+    <h2 class="closing">{{욕구 장면 문구 — "내일 아침, 책상 위에 ○○가 서 있을 거예요" 식. "사라/구매" 금지}}</h2>
+  </div>
+</section>
+
+<!-- 12. 배송 · 교환 · 고지 -->
+<section class="s s-12 alt notice">
+  <div class="tx">
+    <h3>{{배송 · 교환 안내}}</h3>
+    <ul class="notice-list">
+      <li><b>배송</b> {{배송 안내}}</li>
+      <li><b>교환/환불</b> {{기준}}</li>
+      <li>{{법적 고지 — 식품/화장품/건기식 필수 문구}}</li>
+      <li>사용 장면은 연출 이미지(AI 활용)이며, 실물은 "실물 디테일" 섹션 사진을 기준으로 해주세요.</li>
+      <!-- 실물 사진이 하나도 없으면(9번도 AI) 위 줄 대신: "상세의 사진은 연출 이미지(AI 활용)예요. 색·크기는 실제와 조금 다를 수 있어요." -->
+    </ul>
+  </div>
+</section>
+
+<!-- PAGE-BODY:END -->
+</div>
+
+<script>
+/* 모션 ② 숫자 카운트업 — .big[data-count]가 화면에 들어오면 0.9초 동안 올라간다. 한 번만. */
+(function(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+    document.querySelectorAll('.big[data-count]').forEach(function(el){ el.classList.add('done'); });
+    return;
+  }
+  var els = document.querySelectorAll('.big[data-count]');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (!e.isIntersecting || e.target.classList.contains('done')) return;
+      var el = e.target, raw = el.getAttribute('data-count') || '', suf = el.getAttribute('data-suffix') || '';
+      var target = parseFloat(raw.replace(/,/g,'')); if (isNaN(target)) { el.classList.add('done'); return; }
+      var dec = (raw.split('.')[1] || '').length, t0 = performance.now(), dur = 900;
+      el.classList.add('done');
+      (function tick(now){
+        var p = Math.min(1, (now - t0) / dur), k = 1 - Math.pow(1 - p, 3);
+        var v = target * k; el.textContent = v.toLocaleString('ko-KR', {minimumFractionDigits:dec, maximumFractionDigits:dec}) + suf;
+        if (p < 1) requestAnimationFrame(tick); else el.textContent = target.toLocaleString('ko-KR',{minimumFractionDigits:dec,maximumFractionDigits:dec}) + suf;
+      })(t0);
+      io.unobserve(el);
+    });
+  }, {threshold:.6});
+  els.forEach(function(el){ io.observe(el); });
+})();
+</script>
+</body>
+</html>
